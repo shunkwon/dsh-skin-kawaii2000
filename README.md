@@ -1,24 +1,26 @@
-# kawaii 2000s · dsh 皮肤
+# kawaii 2000s · dsh skin
 
-给 DeepSeek Harness 网页端的换皮肤：糖果粉 + 婴儿蓝的配色，满满 2000 年代。
+[中文版本](./README.zh.md)
 
-## 截图
+A skin for the DeepSeek Harness web UI: candy pink + baby blue, all the 2000s vibes.
 
-白天 | 夜间
+## Screenshots
+
+Light | Dark
 ---|---
-<img src="screenshots/light.png" width="640" alt="kawaii 2000s 白天"> | <img src="screenshots/dark.png" width="640" alt="kawaii 2000s 夜间">
+<img src="screenshots/light.png" width="640" alt="kawaii 2000s light"> | <img src="screenshots/dark.png" width="640" alt="kawaii 2000s dark">
 
-## 安装
+## Install
 
-三步搞定：
+Three steps:
 
-**1.** `~/.dsh/profiles/web/package.json` 的 `dependencies` 里加一行：
+**1.** Add a line to `dependencies` in `~/.dsh/profiles/web/package.json`:
 
 ```json
 "dsh-skin-kawaii2000": "github:shunkwon/dsh-skin-kawaii2000"
 ```
 
-**2.** `~/.dsh/profiles/web/cordis.patch.yml` 里加一段：
+**2.** Add a block to `~/.dsh/profiles/web/cordis.patch.yml`:
 
 ```yaml
 - insert:
@@ -26,18 +28,18 @@
       name: dsh-skin-kawaii2000
 ```
 
-**3.** 装包、重启 dsh：
+**3.** Install and restart dsh:
 
 ```bash
 cd ~/.dsh/profiles/web
 pnpm install
 ```
 
-完事，打开 http://127.0.0.1:3080 就能看到粉粉的界面啦。
+Done — open http://127.0.0.1:3080 and enjoy the pink ✨
 
-### 不想用了？
+### Want to disable it?
 
-给 patch 里那行加 `disabled: true` 再重启，或者把上面加的两处都删掉。
+Add `disabled: true` to that patch line and restart, or remove both additions above.
 
 ## License
 
