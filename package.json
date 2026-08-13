@@ -7,7 +7,7 @@
     "type": "git",
     "url": "https://github.com/shunkwon/dsh-skin-kawaii2000.git"
   },
-  "description": "dsh 皮肤:粉红小屋 —— 2000-2002 个人主页语汇的可爱变体(糖果粉 + Win2000 斜角 + 零圆角零渐变 + web-safe 216 色)",
+  "description": "dsh 皮肤 kawaii 2000s —— 2000-2002 个人主页语汇的可爱变体(糖果粉 + Win2000 斜角 + 零圆角零渐变 + web-safe 216 色)",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
