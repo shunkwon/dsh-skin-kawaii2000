@@ -1,0 +1,33 @@
+{
+  "name": "dsh-skin-kawaii2000",
+  "version": "1.0.0",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shunkwon/dsh-skin-kawaii2000.git"
+  },
+  "description": "dsh 皮肤:粉红小屋 —— 2000-2002 个人主页语汇的可爱变体(糖果粉 + Win2000 斜角 + 零圆角零渐变 + web-safe 216 色)",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-theme"
+      ],
+      "platform": "web",
+      "immediately": true
+    }
+  },
+  "scripts": {
+    "build": "node build.mjs"
+  }
+}

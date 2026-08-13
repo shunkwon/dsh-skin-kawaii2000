@@ -1,0 +1,642 @@
+/* ==========================================================================
+   dsh skin — 粉红小屋 (kawaii 2000s)
+   --------------------------------------------------------------------------
+   2000-2002 个人主页语汇的可爱变体:窗体骨架仍是 Win2000 斜角控件,
+   配色换成糖果粉 + 婴儿蓝。规则与机构版同源:
+
+     · 零圆角、零渐变 —— 立体只来自双色斜角边,不来自模糊投影
+     · 一切彩色落在 216 色 web-safe 六档 (00/33/66/99/cc/ff)
+     · 对比度对着实际面色算,不是对着白底
+     · 系统字体栈,零远程依赖
+
+   实现方式:覆盖 dsh 的 --dsw-* 设计令牌。选择器一律用 `html body`
+   (特指度 0,0,2) 压过主题表的 `body` (0,0,1),因此与样式表插入顺序无关。
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. 令牌层 — 白天(糖果粉)
+   -------------------------------------------------------------------------- */
+html body {
+  /* 皮肤自有令牌 */
+  --k-ground:   #ff99cc;   /* 桌面地色(侧栏) */
+  --k-face:     #ffccff;   /* 窗体面色 */
+  --k-face2:    #ffcccc;   /* 次级面 */
+  --k-well:     #ffffff;   /* 凹陷井(输入区) */
+  --k-note:     #ffffcc;   /* 经典淡黄(代码/提示) */
+  --k-cyan:     #ccffff;   /* 婴儿蓝(对方气泡) */
+
+  --k-band:     #993366;   /* 实心标题带,白字 6.95:1 */
+  --k-band-ink: #ffffff;
+  --k-primary:  #cc0066;   /* 主按钮填色,白字 5.59:1 */
+
+  --k-frame:    #000000;   /* 门户线 = 黑 */
+  --k-bev-hi:   #ffffff;   /* 斜角外层高光(上/左) */
+  --k-bev-lt:   #ffffff;   /* 斜角内层高光 */
+  --k-bev-dk:   #cc6699;   /* 斜角内层阴影 */
+  --k-bev-sh:   #993366;   /* 斜角外层阴影(下/右) */
+
+  --k-ink:      #000000;
+  --k-muted:    #333333;
+  --k-faint:    #663366;
+
+  /* 字体栈 —— 零远程依赖 */
+  --dsw-font-family: Tahoma, Verdana, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --ds-font-family-code: "Courier New", Menlo, monospace;
+  --k-font-song: "Songti SC", SimSun, "PingFang SC", serif;
+
+  /* ---- static 调色板:整条中性坡道染成糖果色 ---- */
+  --dsw-static-neutral-bluish-00:   #ffccff;
+  --dsw-static-neutral-bluish-50:   #ffccff;
+  --dsw-static-neutral-bluish-60:   #ffcccc;
+  --dsw-static-neutral-bluish-75:   #ff99cc;
+  --dsw-static-neutral-bluish-100:  #ff99cc;
+  --dsw-static-neutral-bluish-150:  #ff99cc;
+  --dsw-static-neutral-bluish-200:  #ff66cc;
+  --dsw-static-neutral-bluish-300:  #cc6699;
+  --dsw-static-neutral-bluish-400:  #cc6699;
+  --dsw-static-neutral-bluish-500:  #996699;
+  --dsw-static-neutral-bluish-600:  #663366;
+  --dsw-static-neutral-bluish-700:  #333333;
+  --dsw-static-neutral-bluish-750:  #993366;
+  --dsw-static-neutral-bluish-800:  #660033;
+  --dsw-static-neutral-bluish-850:  #660033;
+  --dsw-static-neutral-bluish-875:  #330033;
+  --dsw-static-neutral-bluish-900:  #330033;
+  --dsw-static-neutral-bluish-950:  #330033;
+  --dsw-static-neutral-bluish-1000: #000000;
+
+  --dsw-static-neutral-00:   #ffffff;
+  --dsw-static-neutral-50:   #ffccff;
+  --dsw-static-neutral-100:  #ffccff;
+  --dsw-static-neutral-150:  #ff99cc;
+  --dsw-static-neutral-200:  #ff99cc;
+  --dsw-static-neutral-250:  #ff66cc;
+  --dsw-static-neutral-300:  #cc6699;
+  --dsw-static-neutral-400:  #cc6699;
+  --dsw-static-neutral-500:  #996699;
+  --dsw-static-neutral-550:  #663366;
+  --dsw-static-neutral-600:  #663366;
+  --dsw-static-neutral-700:  #333333;
+  --dsw-static-neutral-800:  #330033;
+  --dsw-static-neutral-850:  #330033;
+  --dsw-static-neutral-900:  #000000;
+  --dsw-static-neutral-1000: #000000;
+
+  /* DeepSeek 品牌蓝 → 品牌粉 */
+  --dsw-static-deepseek-50:  #ffccff;
+  --dsw-static-deepseek-100: #ffccff;
+  --dsw-static-deepseek-200: #ff99cc;
+  --dsw-static-deepseek-300: #ff66cc;
+  --dsw-static-deepseek-400: #cc0066;
+  --dsw-static-deepseek-450: #cc0066;
+  --dsw-static-deepseek-500: #cc0066;
+  --dsw-static-deepseek-600: #993366;
+  --dsw-static-deepseek-800: #660033;
+  --dsw-static-deepseek-900: #330033;
+
+  /* 语义三色 —— 在粉面 #ffccff 上 5.29 / 5.42 / 6.51 */
+  --dsw-static-green-100: #ccffcc;
+  --dsw-static-green-400: #006600;
+  --dsw-static-green-500: #006600;
+  --dsw-static-green-900: #003300;
+  --dsw-static-amber-100: #ffffcc;
+  --dsw-static-amber-400: #993300;
+  --dsw-static-amber-500: #993300;
+  --dsw-static-amber-600: #993300;
+  --dsw-static-amber-900: #330000;
+  --dsw-static-red-50:    #ffcccc;
+  --dsw-static-red-100:   #ffcccc;
+  --dsw-static-red-400:   #990000;
+  --dsw-static-red-500:   #990000;
+  --dsw-static-red-600:   #990000;
+  --dsw-static-red-900:   #330000;
+
+  --dsw-static-blue-50:   #ccffff;
+  --dsw-static-blue-50p:  #ccffff;
+  --dsw-static-blue-75:   #ccffff;
+  --dsw-static-blue-100:  #ccffff;
+  --dsw-static-blue-300:  #99ccff;
+  --dsw-static-blue-400:  #0000cc;
+  --dsw-static-blue-450:  #0000cc;
+  --dsw-static-blue-500:  #0000cc;
+  --dsw-static-blue-600:  #000099;
+  --dsw-static-blue-800:  #000066;
+  --dsw-static-blue-900:  #000066;
+  --dsw-static-blue-950:  #000033;
+
+  /* ---- alias 层 ---- */
+  --dsw-alias-bg-base:    var(--k-face);
+  --dsw-alias-bg-layer-1: var(--k-face);
+  --dsw-alias-bg-layer-2: var(--k-face2);
+  --dsw-alias-bg-layer-3: var(--k-face);
+  --dsw-alias-bg-module-platform: var(--k-face2);
+  --dsw-alias-bg-multi-select:    var(--k-face2);
+  --dsw-alias-bg-overlay:  var(--k-face2);
+  --dsw-alias-bg-skeleton: rgba(153, 0, 102, 0.12);
+  --dsw-alias-bg-mask-1:   rgba(51, 0, 51, 0.32);
+  --dsw-alias-bg-mask-2:   rgba(51, 0, 51, 0.16);
+  --dsw-alias-bg-mask-3:   rgba(51, 0, 51, 0.48);
+  --dsw-alias-bg-mask-drop: rgba(255, 204, 255, 0.75);
+
+  /* 分隔线坡道:l1/l2 是应用到处用的「顺带一条线」(原值 rgba(0,0,0,.04/.1)
+     的发丝线),把它们设成纯黑等于加粗十倍 —— 页头那条 1px 分隔线就是这么
+     变成一条贯穿全宽黑杠的(`.wSkVaW_header::after` 取 l2 当 background)。
+     这里走同族的柔和粉紫,越靠后越重;真正的结构框线(表格/代码块/控件/
+     标签)不用这些令牌,直接走 --k-frame 黑,所以门户骨架仍是黑线。 */
+  --dsw-alias-border-l1: #ffcccc;
+  --dsw-alias-border-l2: #cc99cc;
+  --dsw-alias-border-l3: #cc6699;
+  --dsw-alias-border-l4: #993366;
+  --dsw-alias-border-l2-darkmode-thin: #cc99cc;
+  --dsw-alias-border-inverted:  #cc99cc;
+  --dsw-alias-border-inverted2: #cc99cc;
+
+  --dsw-alias-brand-primary:        var(--k-primary);
+  --dsw-alias-brand-primary-invert: var(--k-primary);
+  --dsw-alias-brand-text:           var(--k-band);
+  --dsw-alias-brand-primary-new-colorprimary-new-color: var(--k-primary);
+
+  --dsw-alias-button-primary-fill:   var(--k-primary);
+  --dsw-alias-button-primary-hover:  #990033;
+  --dsw-alias-button-primary-dimmed: var(--k-face2);
+  --dsw-alias-button-contrast-fill:  var(--k-band);
+  --dsw-alias-button-elevated-fill:  var(--k-face);
+  --dsw-alias-button-floating-fill:  var(--k-face);
+  --dsw-alias-button-floating-hover: var(--k-ground);
+  --dsw-alias-button-ghost-active-fill:   var(--k-ground);
+  --dsw-alias-button-ghost-active-hover:  #ff66cc;
+  --dsw-alias-button-ghost-active-border: var(--k-frame);
+  --dsw-alias-button-info-fill:  var(--k-primary);
+  --dsw-alias-button-info-hover: #990033;
+  --dsw-alias-button-tool-bar-fill: rgba(153, 51, 102, 0.55);
+  --dsw-alias-button-tool-bar-hover: rgba(153, 51, 102, 0.75);
+  --dsw-alias-button-tool-bar-fill-invisible: rgba(153, 51, 102, 0.36);
+
+  --dsw-alias-interactive-bg-hover:        rgba(153, 0, 102, 0.10);
+  --dsw-alias-interactive-bg-hover-accent: rgba(153, 0, 102, 0.20);
+  --dsw-alias-interactive-bg-hover-solid:  var(--k-ground);
+  --dsw-alias-interactive-bg-hover-danger: rgba(153, 0, 0, 0.12);
+  --dsw-alias-interactive-bg-active:       rgba(153, 0, 102, 0.22);
+
+  --dsw-alias-label-primary:           var(--k-ink);
+  --dsw-alias-label-secondary:         var(--k-muted);
+  --dsw-alias-label-tertiary:          var(--k-faint);
+  --dsw-alias-label-caption:           var(--k-faint);
+  --dsw-alias-label-dimmed:            #996699;
+  --dsw-alias-label-primary-dimmed:    var(--k-muted);
+  --dsw-alias-label-primary-inverted:  #ffffff;
+  --dsw-alias-label-primary-foreground:#ffffff;
+  --dsw-alias-label-primary-bluish:    #000066;
+
+  --dsw-alias-markdown-code-block:        var(--k-note);
+  --dsw-alias-markdown-code-block-banner: #ffff99;
+  --dsw-alias-markdown-inline-code:       var(--k-note);
+  --dsw-alias-markdown-code-segment-selected:   var(--k-note);
+  --dsw-alias-markdown-code-segment-unselected: var(--k-face2);
+  --dsw-alias-markdown-citation:    var(--k-cyan);
+  --dsw-alias-markdown-tag:         var(--k-face2);
+  --dsw-alias-markdown-placeholder: var(--k-face2);
+
+  --dsw-alias-scrollbar-bg-l1:    var(--k-face);
+  --dsw-alias-scrollbar-bg-l2:    var(--k-face);
+  --dsw-alias-scrollbar-hover-l1: var(--k-ground);
+  --dsw-alias-scrollbar-hover-l2: var(--k-ground);
+
+  --dsw-alias-state-business-primary:  var(--k-primary);
+  --dsw-alias-state-business-tertiary: var(--k-face2);
+  --dsw-alias-state-success-primary:   #006600;
+  --dsw-alias-state-success-secondary: #006600;
+  --dsw-alias-state-success-tertiary:  #ccffcc;
+  --dsw-alias-state-warn-primary:  #993300;
+  --dsw-alias-state-warn-secondary:#993300;
+  --dsw-alias-state-warn-label:    #993300;
+  --dsw-alias-state-warn-tertiary: var(--k-note);
+  --dsw-alias-state-error-primary:  #990000;
+  --dsw-alias-state-error-secondary:#990000;
+
+  --dsw-alias-toast-bg:   var(--k-band);
+  --dsw-alias-tooltip-bg: var(--k-band);
+
+  --dsw-specific-bubble:           var(--k-cyan);
+  --dsw-specific-bubble-highlight: #99ffff;
+  --dsw-specific-input-major:      var(--k-well);
+  --dsw-specific-login-input:      var(--k-well);
+  --dsw-specific-menu:             var(--k-face);
+  --dsw-specific-selector:         var(--k-face2);
+  --dsw-specific-tip:              var(--k-note);
+  --dsw-specific-sidebar-fill:                 var(--k-ground);
+  --dsw-specific-sidebar-nav-item-hover:       #ff66cc;
+  --dsw-specific-sidebar-nav-item-active:      var(--k-face);
+  --dsw-specific-sidebar-nav-item-active-accent: var(--k-face);
+
+  /* 现代阴影令牌一律置空 —— 立体只允许来自斜角 */
+  --dsw-shadow-lv1: none;
+  --dsw-shadow-lv2: none;
+  --dsw-shadow-lv3: none;
+  --dsw-shadow-lv4: none;
+  --dsw-mask-blur: none;
+  --dsw-hovercard-bg: var(--k-face);
+}
+
+/* --------------------------------------------------------------------------
+   2. 令牌层 — 夜间(深紫糖果)
+   系统处于暗色模式时才生效。不是终端风:仍是实心面 + 斜角,只是把
+   糖果坡道整体压暗到深紫。
+   -------------------------------------------------------------------------- */
+html body[data-ds-dark-theme] {
+  --k-ground:   #330033;
+  --k-face:     #660066;
+  --k-face2:    #663366;
+  --k-well:     #330033;
+  --k-note:     #333300;
+  --k-cyan:     #003333;
+
+  --k-band:     #993366;
+  --k-primary:  #ff99cc;
+
+  --k-frame:    #ffccff;
+  --k-bev-hi:   #cc99cc;
+  --k-bev-lt:   #cc66cc;
+  --k-bev-dk:   #660066;
+  --k-bev-sh:   #330033;
+
+  --k-ink:      #ffccff;
+  --k-muted:    #ffccff;
+  --k-faint:    #cc99cc;
+
+  --dsw-static-neutral-bluish-00:   #660066;
+  --dsw-static-neutral-bluish-50:   #ffccff;
+  --dsw-static-neutral-bluish-60:   #663366;
+  --dsw-static-neutral-bluish-75:   #663366;
+  --dsw-static-neutral-bluish-100:  #ffccff;
+  --dsw-static-neutral-bluish-150:  #663366;
+  --dsw-static-neutral-bluish-200:  #cc99cc;
+  --dsw-static-neutral-bluish-300:  #cc99cc;
+  --dsw-static-neutral-bluish-400:  #cc99cc;
+  --dsw-static-neutral-bluish-500:  #cc66cc;
+  --dsw-static-neutral-bluish-600:  #cc99cc;
+  --dsw-static-neutral-bluish-700:  #996699;
+  --dsw-static-neutral-bluish-750:  #663366;
+  --dsw-static-neutral-bluish-800:  #660066;
+  --dsw-static-neutral-bluish-850:  #660066;
+  --dsw-static-neutral-bluish-875:  #660066;
+  --dsw-static-neutral-bluish-900:  #330033;
+  --dsw-static-neutral-bluish-950:  #330033;
+  --dsw-static-neutral-bluish-1000: #ffccff;
+
+  --dsw-static-deepseek-400: #ff99cc;
+  --dsw-static-deepseek-450: #ff99cc;
+  --dsw-static-deepseek-500: #ff99cc;
+  --dsw-static-deepseek-800: #663366;
+
+  --dsw-static-green-500: #99ff99;
+  --dsw-static-green-400: #99ff99;
+  --dsw-static-amber-500: #ffcc00;
+  --dsw-static-amber-400: #ffcc00;
+  --dsw-static-amber-600: #ffcc00;
+  --dsw-static-red-500:   #ff9999;
+  --dsw-static-red-400:   #ff9999;
+  --dsw-static-red-600:   #ff9999;
+
+  --dsw-alias-bg-base:    var(--k-ground);
+  --dsw-alias-bg-layer-1: var(--k-face);
+  --dsw-alias-bg-layer-2: var(--k-face2);
+  --dsw-alias-bg-layer-3: var(--k-face);
+  --dsw-alias-bg-module-platform: var(--k-face2);
+  --dsw-alias-bg-overlay: var(--k-face2);
+  --dsw-alias-bg-skeleton: rgba(255, 204, 255, 0.12);
+
+  /* 同上:通用分隔线不用 --k-frame(暗色下是亮粉),否则页头那条 1px 会
+     画成一条贯穿全宽的亮线。 */
+  --dsw-alias-border-l1: #663366;
+  --dsw-alias-border-l2: #996699;
+  --dsw-alias-border-l3: #cc66cc;
+  --dsw-alias-border-l4: #cc99cc;
+  --dsw-alias-border-l2-darkmode-thin: #663366;
+  --dsw-alias-border-inverted:  #996699;
+  --dsw-alias-border-inverted2: #996699;
+
+  --dsw-alias-brand-primary:        var(--k-primary);
+  --dsw-alias-brand-primary-invert: var(--k-primary);
+  --dsw-alias-brand-text:           var(--k-ink);
+
+  --dsw-alias-button-primary-fill:  var(--k-primary);
+  --dsw-alias-button-primary-hover: #ffccff;
+  --dsw-alias-button-contrast-fill: var(--k-primary);
+  --dsw-alias-button-elevated-fill: var(--k-face);
+  --dsw-alias-button-floating-fill: var(--k-face);
+  --dsw-alias-button-floating-hover: var(--k-face2);
+  --dsw-alias-button-ghost-active-fill: var(--k-face2);
+  --dsw-alias-button-info-fill: var(--k-primary);
+
+  --dsw-alias-interactive-bg-hover:        rgba(255, 204, 255, 0.12);
+  --dsw-alias-interactive-bg-hover-accent: rgba(255, 204, 255, 0.24);
+  --dsw-alias-interactive-bg-hover-solid:  var(--k-face2);
+  --dsw-alias-interactive-bg-active:       rgba(255, 204, 255, 0.20);
+
+  --dsw-alias-label-primary:          var(--k-ink);
+  --dsw-alias-label-secondary:        #ffccff;
+  --dsw-alias-label-tertiary:         var(--k-faint);
+  --dsw-alias-label-caption:          var(--k-faint);
+  --dsw-alias-label-dimmed:           #996699;
+  --dsw-alias-label-primary-inverted: #330033;
+  --dsw-alias-label-primary-foreground: #330033;
+
+  --dsw-alias-markdown-code-block:        var(--k-note);
+  --dsw-alias-markdown-code-block-banner: #333300;
+  --dsw-alias-markdown-inline-code:       var(--k-note);
+  --dsw-alias-markdown-citation:          var(--k-cyan);
+
+  --dsw-alias-scrollbar-bg-l1:    var(--k-face);
+  --dsw-alias-scrollbar-bg-l2:    var(--k-face);
+  --dsw-alias-scrollbar-hover-l1: var(--k-face2);
+  --dsw-alias-scrollbar-hover-l2: var(--k-face2);
+
+  --dsw-alias-state-success-primary: #99ff99;
+  --dsw-alias-state-warn-primary:    #ffcc00;
+  --dsw-alias-state-warn-label:      #ffcc00;
+  --dsw-alias-state-error-primary:   #ff9999;
+
+  --dsw-specific-bubble:           var(--k-cyan);
+  --dsw-specific-bubble-highlight: #006666;
+  --dsw-specific-input-major:      var(--k-well);
+  --dsw-specific-menu:             var(--k-face);
+  --dsw-specific-selector:         var(--k-face2);
+  --dsw-specific-tip:              var(--k-note);
+  --dsw-specific-sidebar-fill:              var(--k-ground);
+  --dsw-specific-sidebar-nav-item-hover:    var(--k-face2);
+  --dsw-specific-sidebar-nav-item-active:   var(--k-face);
+  --dsw-specific-sidebar-nav-item-active-accent: var(--k-face);
+}
+
+/* --------------------------------------------------------------------------
+   3. 结构层 — 零圆角
+   组件 CSS 用 class 特指度写 border-radius,只能靠 !important 统一压平。
+   这是本体系的绝对规则:2000-2002 是直角。
+   -------------------------------------------------------------------------- */
+html body *,
+html body *::before,
+html body *::after {
+  border-radius: 0 !important;
+}
+
+/* --------------------------------------------------------------------------
+   4. 结构层 — 斜角原语
+   凸起:上/左亮,下/右暗;凹陷反向。box-shadow 在这里是零模糊 inset 硬边线,
+   不是投影。
+
+   原则:只强制几何(边框宽度/样式/四色/内斜角线),不强制 background-color。
+   组件 CSS 用 class 特指度(0,1,0)压过 `html body button`(0,0,3),所以几何
+   必须带 !important;但底色留给 token 层解析 —— 这样主操作键保住自己的品牌
+   填色,透明图标键则透出所在面色,不会被刷成一片同色。
+   -------------------------------------------------------------------------- */
+html body button,
+html body [role="button"],
+html body summary {
+  box-sizing: border-box !important;
+  border-width: 2px !important;
+  border-style: solid !important;
+  border-color: var(--k-bev-hi) var(--k-bev-sh) var(--k-bev-sh) var(--k-bev-hi) !important;
+  box-shadow: inset 1px 1px 0 var(--k-bev-lt), inset -1px -1px 0 var(--k-bev-dk) !important;
+  font-family: var(--dsw-font-family);
+}
+
+/* 按下感:斜角翻转为凹陷 */
+html body button:active,
+html body [role="button"]:active,
+html body summary:active,
+html body details[open] > summary {
+  border-color: var(--k-bev-dk) var(--k-bev-hi) var(--k-bev-hi) var(--k-bev-dk) !important;
+  box-shadow: inset 1px 1px 0 var(--k-bev-sh), inset -1px -1px 0 var(--k-bev-lt) !important;
+}
+
+/* 禁用态:不给斜角,平贴 */
+html body button:disabled,
+html body button[aria-disabled="true"] {
+  border-color: var(--k-bev-dk) !important;
+  box-shadow: none !important;
+  color: #996699;
+}
+
+/* ── 标签页:不是凸起按钮 ──────────────────────────────────────────────
+   Win2000 里 tab 是独立控件,不是 push button。原生组件是「无边框文字 +
+   底部 11px 留白给一根 2px 下划线」,一旦套上通用凸起斜角,那 27px 高的
+   空盒子就整个暴露出来 —— 这正是「框有点大」的来源。
+
+   改成真·标签条:未选中平贴且下沉一格,选中的凸起、加粗、底边取面色开口
+   与下方面板连通。那根 2px 底缘强调条是 Material 语汇(skill 否决项),
+   去掉,选中态改由 tab 形状本身表达。
+
+   不加标签条基线。`.wSkVaW_tabs` 容器是整个对话面板那么宽(实测 1112px),
+   而两个标签才占约 100px —— 给它 border-bottom 会画成一条贯穿全宽的黑线,
+   比原来那根 2px 强调条更抢眼(实测栽过一次)。标签自己的边框已经足够
+   表达标签形状。 */
+html body [role="tablist"] {
+  gap: 0 !important;
+  border-bottom: 0 !important;
+  align-items: flex-end;
+}
+
+/* 两个标签同族:同一套边框、相邻不留缝、底边一律敞口(向下并入面板)。
+   高低差只由 padding 产生 —— flex-end 底对齐,未选中的顶边自然低 2px,
+   就是 Win2000 里「未选中标签往下沉一格」的样子。 */
+html body [role="tab"] {
+  box-sizing: border-box !important;
+  border-width: 1px 1px 0 1px !important;
+  border-style: solid !important;
+  border-color: var(--k-frame) !important;
+  box-shadow: none !important;
+  background-color: var(--k-face2);
+  color: var(--k-faint);
+  font-weight: 400;
+  padding: 3px 12px !important;
+  margin: 0 !important;
+  position: relative;
+}
+
+html body [role="tab"][aria-selected="true"] {
+  background-color: var(--k-face);
+  color: var(--k-ink);
+  font-weight: 700;
+  padding: 5px 12px 3px !important;
+  z-index: 1;
+}
+
+/* 标签不吃通用按钮的「按下翻转凹陷」。上面那条 `button:active` 是 (0,1,3),
+   这里用 (0,2,2) 压过它 —— 标签页没有按下弹起的动作。 */
+html body [role="tab"]:active {
+  border-color: var(--k-frame) !important;
+  box-shadow: none !important;
+}
+
+/* 底缘 accent 强调条 —— 否决项,去掉 */
+html body [role="tab"]::after,
+html body [role="tab"]::before {
+  display: none !important;
+}
+
+/* 输入区 = 凹陷井。同样只强制几何,底色由 --dsw-specific-input-major 决定 */
+html body input,
+html body textarea,
+html body select,
+html body [contenteditable="true"] {
+  box-sizing: border-box !important;
+  border-width: 2px !important;
+  border-style: solid !important;
+  border-color: var(--k-bev-dk) var(--k-bev-hi) var(--k-bev-hi) var(--k-bev-dk) !important;
+  box-shadow: inset 1px 1px 0 var(--k-bev-sh), inset -1px -1px 0 var(--k-bev-lt) !important;
+  color: var(--k-ink);
+  font-family: var(--dsw-font-family);
+}
+
+/* 焦点 = 点线框,不是发光 */
+html body input:focus,
+html body textarea:focus,
+html body select:focus,
+html body [contenteditable="true"]:focus {
+  outline: 1px dotted var(--k-ink) !important;
+  outline-offset: -4px;
+}
+
+/* --------------------------------------------------------------------------
+   5. 结构层 — Win2000 滚动条
+   -------------------------------------------------------------------------- */
+html body ::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+html body ::-webkit-scrollbar-track {
+  background-color: var(--k-face2);
+  border-left: 1px solid var(--k-bev-dk);
+}
+html body ::-webkit-scrollbar-thumb {
+  background-color: var(--k-face);
+  border: 2px solid;
+  border-color: var(--k-bev-hi) var(--k-bev-sh) var(--k-bev-sh) var(--k-bev-hi);
+  box-shadow: inset 1px 1px 0 var(--k-bev-lt), inset -1px -1px 0 var(--k-bev-dk);
+}
+html body ::-webkit-scrollbar-corner {
+  background-color: var(--k-face2);
+}
+
+/* --------------------------------------------------------------------------
+   6. 排版层
+   宋体只用在非粗体的中文正文(宋体无中文粗体,合成粗体发糊);
+   粗体标题与 UI 铭牌仍走黑体。含中文的列不套 mono。
+   -------------------------------------------------------------------------- */
+html body {
+  background-color: var(--dsw-alias-bg-base);
+  color: var(--k-ink);
+  font-family: var(--dsw-font-family);
+}
+
+html body p,
+html body li,
+html body dd,
+html body blockquote {
+  font-family: var(--k-font-song);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+html body h1,
+html body h2,
+html body h3,
+html body h4,
+html body h5,
+html body h6,
+html body strong,
+html body b,
+html body th {
+  font-family: var(--dsw-font-family);
+  font-weight: 700;
+}
+
+/* 数字等宽,刷新不跳动 */
+html body code,
+html body pre,
+html body time,
+html body [class*="token"],
+html body [class*="count"] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 代码块 = 经典淡黄纸 + 黑框 */
+html body pre,
+html body code {
+  font-family: var(--ds-font-family-code);
+}
+html body pre {
+  background-color: var(--k-note);
+  border: 1px solid var(--k-frame);
+}
+
+/* 表格 = 黑网格 */
+html body table {
+  border-collapse: collapse;
+}
+html body th,
+html body td {
+  border: 1px solid var(--k-frame);
+}
+html body th {
+  background-color: var(--k-band);
+  color: var(--k-band-ink);
+}
+
+/* 经典蓝链 / 紫已访问 */
+html body a {
+  color: #0000cc;
+  text-decoration: underline;
+}
+html body a:visited {
+  color: #660099;
+}
+
+/* 选中态 = 实心品牌粉 */
+html body ::selection {
+  background-color: var(--k-primary);
+  color: #ffffff;
+}
+
+/* details 折叠标记换成 [+] / [−] */
+html body summary {
+  list-style: none;
+}
+html body summary::-webkit-details-marker {
+  display: none;
+}
+html body summary::before {
+  content: "[+] ";
+  font-family: var(--ds-font-family-code);
+}
+html body details[open] > summary::before {
+  content: "[\2212] ";
+}
+
+/* 列表项换成像素心 —— 唯一的装饰性放纵 */
+html body ul > li::marker {
+  content: "\2665  ";
+  color: var(--k-primary);
+}
+
+/* --------------------------------------------------------------------------
+   7. 否决项兜底 — 把体系外的现代残留压掉
+   -------------------------------------------------------------------------- */
+
+/* 零渐变。CSS 选不中「带渐变的元素」,只能整体清掉后代的背景图。
+   实测全页唯一的 background-image 就是侧栏截断用的淡出遮罩
+   (span.qDHVXG_fade),清掉后文字改为硬截断 —— 2000-2002 本来就没有
+   淡出遮罩这种东西。body 自身不在此规则内,留作日后铺墙纸的位置。 */
+html body *,
+html body *::before,
+html body *::after {
+  background-image: none !important;
+}
+
+/* 图片/画布的圆形裁切一并压平(零圆角规则的延伸) */
+html body img,
+html body svg,
+html body canvas {
+  border-radius: 0 !important;
+}
