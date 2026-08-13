@@ -2,6 +2,7 @@
   "name": "dsh-skin-kawaii2000",
   "version": "1.0.0",
   "private": true,
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/shunkwon/dsh-skin-kawaii2000.git"
