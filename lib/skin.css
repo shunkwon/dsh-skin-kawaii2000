@@ -418,33 +418,42 @@ html body button[aria-disabled="true"] {
   color: #996699;
 }
 
-/* ── 标签页:不是凸起按钮 ──────────────────────────────────────────────
-   Win2000 里 tab 是独立控件,不是 push button。原生组件是「无边框文字 +
-   底部 11px 留白给一根 2px 下划线」,一旦套上通用凸起斜角,那 27px 高的
-   空盒子就整个暴露出来 —— 这正是「框有点大」的来源。
+/* ── 标签页:真·Win2000 标签条 ─────────────────────────────────────────
+   Win2000 的 tab 既不是凸起按钮,也不是「文字 + 下划线」,而是一排坐在
+   基线上的页签:
 
-   改成真·标签条:未选中平贴且下沉一格,选中的凸起、加粗、底边取面色开口
-   与下方面板连通。那根 2px 底缘强调条是 Material 语汇(skill 否决项),
-   去掉,选中态改由 tab 形状本身表达。
+     · 基线 = 页头那条贯穿全宽的 ::after 线(取 --dsw-alias-border-l2),
+       天然全宽,不需要给 1112px 的容器再加 border-bottom(实测那会画成
+       一根比 2px 强调条更抢眼的黑杠)。所有标签底边对齐、坐在基线上,
+       基线从每个未选中标签的底边下穿过,只有选中标签盖住自己那段。
+     · 未选中:1px 斜角边(上/左亮、右暗),底边敞口,面色 = face2(灰),
+       次级文字色、常规字重
+     · 选中:面色换成页面色(--dsw-alias-bg-base),整体比未选中高一档:
+       顶边高出 2px,底缘再向下长出 2px,盖住基线、搭进下方面板 ——
+       标签与页面连成一体。选中态由形状本身表达,不靠 Material 的
+       2px 强调下划线(skill 否决项,保留否决)
 
-   不加标签条基线。`.wSkVaW_tabs` 容器是整个对话面板那么宽(实测 1112px),
-   而两个标签才占约 100px —— 给它 border-bottom 会画成一条贯穿全宽的黑线,
-   比原来那根 2px 强调条更抢眼(实测栽过一次)。标签自己的边框已经足够
-   表达标签形状。 */
+   两个要点:
+   1. 高低差上下都有:Win2000 选中页签不是「顶部凸起」也不是「顶部
+      等高」,而是 2px 上探 + 2px 下探,未选中整体矮 4px、像是沉在
+      它后面。旧的实现只做了上探、且底边悬在基线上方,方向做反了。
+   2. 那 2px 下探用 box-shadow 画:负 margin 不涂底色(背景只涂到
+      边框盒),阴影才画在盒外,能盖住基线又不推高标签条。
+   按下不翻转斜角(标签不是按钮,没有按下弹起)。 */
 html body [role="tablist"] {
   gap: 0 !important;
   border-bottom: 0 !important;
   align-items: flex-end;
 }
 
-/* 两个标签同族:同一套边框、相邻不留缝、底边一律敞口(向下并入面板)。
-   高低差只由 padding 产生 —— flex-end 底对齐,未选中的顶边自然低 2px,
-   就是 Win2000 里「未选中标签往下沉一格」的样子。 */
+/* 未选中页签:斜角边(上/左 = 高光,右 = 外阴影),底边敞口贴基线。
+   相邻标签不留缝:左标签的右阴影 + 右标签的左高光 = Win2000 里
+   标签之间的那道「暗|亮」双线缝。 */
 html body [role="tab"] {
   box-sizing: border-box !important;
   border-width: 1px 1px 0 1px !important;
   border-style: solid !important;
-  border-color: var(--k-frame) !important;
+  border-color: var(--k-bev-hi) var(--k-bev-sh) transparent var(--k-bev-hi) !important;
   box-shadow: none !important;
   background-color: var(--k-face2);
   color: var(--k-faint);
@@ -454,22 +463,34 @@ html body [role="tab"] {
   position: relative;
 }
 
-html body [role="tab"][aria-selected="true"] {
-  background-color: var(--k-face);
-  color: var(--k-ink);
-  font-weight: 700;
-  padding: 5px 12px 3px !important;
-  z-index: 1;
-}
-
 /* 标签不吃通用按钮的「按下翻转凹陷」。上面那条 `button:active` 是 (0,1,3),
-   这里用 (0,2,2) 压过它 —— 标签页没有按下弹起的动作。 */
+   这里用 (0,2,2) 压过它 —— 标签页没有按下弹起的动作。放在选中规则
+   之前:同特指度下后写的选中态胜出,按着选中的标签时那 2px 下探不闪。 */
 html body [role="tab"]:active {
-  border-color: var(--k-frame) !important;
+  border-color: var(--k-bev-hi) var(--k-bev-sh) transparent var(--k-bev-hi) !important;
   box-shadow: none !important;
 }
 
-/* 底缘 accent 强调条 —— 否决项,去掉 */
+/* 选中页签:面色 = 页面色,与下方面板同色连通;顶边比未选中高 2px
+   (padding 上 5px),box-shadow 再向下画 2px 实色,盖住基线再搭进
+   面板 1px —— 2px 上探 + 2px 下探,正是 Win2000 选中页签的样子。 */
+html body [role="tab"][aria-selected="true"] {
+  background-color: var(--dsw-alias-bg-base);
+  color: var(--k-ink);
+  font-weight: 700;
+  z-index: 1;
+  padding: 5px 12px 3px !important;
+  box-shadow: 0 2px 0 0 var(--dsw-alias-bg-base) !important;
+}
+
+/* 暗色修正:选中页签面色 = 页面色(ground),若右斜角还用最暗档
+   --k-bev-sh(#330033)就与面色同色、右缘消失 —— 换用内斜角暗档
+   #660066,右缘仍读得出。 */
+html body[data-ds-dark-theme] [role="tab"][aria-selected="true"] {
+  border-right-color: var(--k-bev-dk) !important;
+}
+
+/* 底缘 accent 强调条 —— Material 语汇,否决项,去掉 */
 html body [role="tab"]::after,
 html body [role="tab"]::before {
   display: none !important;
