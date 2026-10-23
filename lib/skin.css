@@ -75,7 +75,7 @@ html body {
   --kg-accent: #1d1d1f;
   --kg-accent-hover: #3a3a3c;
   --kg-on-accent: #ffffff;
-  --kg-accent-chip: rgba(255, 255, 255, 0.16); /* 强调色面上的快捷键小片 */
+  --kg-on-accent-dim: rgba(255, 255, 255, 0.62); /* 强调色面上的次级字（快捷键） */
   --kg-focus: rgba(0, 0, 0, 0.22);        /* 输入卡聚焦时的发丝线 */
   --kg-focus-halo: rgba(0, 0, 0, 0.05);
   --kg-link-line: rgba(29, 29, 31, 0.28);
@@ -386,7 +386,7 @@ html body[data-ds-dark-theme] {
   --kg-accent: #e8e8ea;
   --kg-accent-hover: #ffffff;
   --kg-on-accent: #1d1d1f;
-  --kg-accent-chip: rgba(0, 0, 0, 0.1);
+  --kg-on-accent-dim: rgba(29, 29, 31, 0.62);
   --kg-focus: rgba(255, 255, 255, 0.26);
   --kg-focus-halo: rgba(255, 255, 255, 0.05);
   --kg-link-line: rgba(242, 242, 243, 0.3);
@@ -871,14 +871,21 @@ html body [data-platform="darwin"] .hHd-Xa_newSession:hover {
   box-shadow: var(--kg-shadow-1) !important;
 }
 html body .hHd-Xa_newSessionLabel,
-html body .hHd-Xa_newSessionShortcut,
 html body .hHd-Xa_newSessionLabelMask {
   color: var(--kg-on-accent) !important;
 }
+/* 悬停时右侧的 ⌥⌘N：不画底片，只用按钮文字色降透明度，像 macOS 菜单里的快捷键。
+   里面的 _keys / kbd 是共用的快捷键组件，自带三级色，外层的颜色传不进去，
+   得在这个按钮里单独让它们继承 —— 别的地方（菜单、提示）的快捷键不受影响。 */
 html body .hHd-Xa_newSessionShortcut {
-  background-color: var(--kg-accent-chip) !important;
-  border-radius: var(--kg-r-xs) !important;
-  padding: 0 5px;
+  background-color: transparent !important;
+  color: var(--kg-on-accent-dim) !important;
+  padding: 0 !important;
+  letter-spacing: 0.04em;
+}
+html body .hHd-Xa_newSessionShortcut [class*="_keys"],
+html body .hHd-Xa_newSessionShortcut kbd {
+  color: inherit !important;
 }
 
 /* 插件 / 自动化任务这些大按钮 = 一层浅玻璃。
