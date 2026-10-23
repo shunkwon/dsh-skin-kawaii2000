@@ -810,14 +810,16 @@ html body .hHd-Xa_newSessionShortcut {
   padding: 0 5px;
 }
 
-/* 插件 / 自动化任务这些大按钮 = 一层浅玻璃 */
+/* 插件 / 自动化任务这些大按钮 = 一层浅玻璃。
+   _seat 系列里 seatIcon / seatLabel / seatChevron 是子节点，:hover 会
+   连它们一起点亮（同一类「子节点命中」的坑），所以把它们排除掉。 */
 html body [class*="_panelRow"],
-html body [class*="_seat"] {
+html body [class*="_seat"]:not([class*="_seatIcon"]):not([class*="_seatLabel"]):not([class*="_seatChevron"]) {
   border-radius: var(--kg-r-sm) !important;
   transition: background-color var(--kg-t), box-shadow var(--kg-t);
 }
 html body [class*="_panelRow"]:hover,
-html body [class*="_seat"]:hover {
+html body [class*="_seat"]:not([class*="_seatIcon"]):not([class*="_seatLabel"]):not([class*="_seatChevron"]):hover {
   background-color: var(--kg-surface) !important;
   box-shadow: inset 0 0 0 1px var(--kg-rim) !important;
 }
@@ -1293,8 +1295,27 @@ html body [class*="_pill"] {
   padding: 2px 10px !important;
 }
 
-/* 工具调用卡片：一层薄玻璃，不模糊（数量多，省 GPU） */
-html body [class*="_card"]:not([class*="uV2eYG_card"]):not([role="dialog"]) {
+/* 工具调用卡片：一层薄玻璃，不模糊（数量多，省 GPU）。
+   只认具体组件的类名 —— 千万不要写 [class*="_card"]：插件列表的每一层
+   子节点都叫 card / cardHead / cardMain / cardDesc / cardIcon，那样会把
+   一圈 16px 圆角描边画到每一层上，正好从标题和说明中间穿过去。 */
+/* 插件列表的一行 = li.card（子节点 cardHead/cardMain/cardDesc 也带 _card，
+   所以只认 li，不认所有 _card） */
+html body li[class*="_card"] {
+  background-color: var(--kg-surface-weak) !important;
+  border-radius: var(--kg-r-md) !important;
+  box-shadow:
+    inset 0 0 0 1px var(--kg-rim),
+    var(--kg-shadow-1) !important;
+  transition: background-color var(--kg-t), box-shadow var(--kg-t);
+}
+html body li[class*="_card"]:hover {
+  background-color: var(--kg-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--kg-rim-top), var(--kg-shadow-2) !important;
+}
+
+html body [class*="CY-8Ka_card"],
+html body [class*="O_Ebla_root"] {
   border-radius: var(--kg-r-md) !important;
   box-shadow:
     inset 0 0 0 1px var(--kg-rim),
