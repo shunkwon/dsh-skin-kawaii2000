@@ -62,6 +62,9 @@ html body {
   --kg-bubble-1: rgba(255, 214, 235, 0.88);
   --kg-bubble-2: rgba(232, 216, 255, 0.82);
   --kg-th-fill: rgba(255, 255, 255, 0.55);
+  /* 分段控件/输入井的凹面 */
+  --kg-well: rgba(158, 96, 150, 0.1);
+  --kg-well-rim: rgba(158, 96, 150, 0.14);
   --kg-hair: rgba(158, 96, 150, 0.16);    /* 玻璃内侧发丝线 */
   --kg-hair-strong: rgba(158, 96, 150, 0.3);
 
@@ -362,6 +365,8 @@ html body[data-ds-dark-theme] {
   --kg-bubble-1: rgba(255, 122, 184, 0.22);
   --kg-bubble-2: rgba(150, 120, 255, 0.2);
   --kg-th-fill: rgba(255, 255, 255, 0.08);
+  --kg-well: rgba(255, 255, 255, 0.05);
+  --kg-well-rim: rgba(255, 255, 255, 0.1);
   --kg-hair: rgba(255, 255, 255, 0.1);
   --kg-hair-strong: rgba(255, 255, 255, 0.18);
 
@@ -878,14 +883,14 @@ html body [class*="bhn1Oq_treeBody"] {
    凹槽，选中项是一块浮起来的白玻璃。
    -------------------------------------------------------------------------- */
 html body [role="tablist"] {
-  background-color: var(--kg-surface-weak) !important;
+  background-color: var(--kg-well) !important;
   background-image: none !important;
   border: 0 !important;
   border-bottom: 0 !important;
   border-radius: var(--kg-r-sm) !important;
   box-shadow:
-    inset 0 0 0 1px var(--kg-rim),
-    inset 0 1px 3px rgba(122, 42, 108, 0.08) !important;
+    inset 0 0 0 1px var(--kg-well-rim),
+    inset 0 1px 3px rgba(122, 42, 108, 0.1) !important;
   padding: 3px !important;
   gap: 2px !important;
   align-items: center !important;
@@ -1172,7 +1177,9 @@ html body[data-ds-dark-theme] [class*="uV2eYG_root"]:focus-within [class*="uV2eY
 /* 输入区内部：不要井、不要框，只留字 */
 html body [class*="uV2eYG_input"],
 html body [class*="uV2eYG_input"]:hover,
-html body [class*="uV2eYG_input"]:focus {
+html body [class*="uV2eYG_input"]:focus,
+html body[data-ds-dark-theme] [class*="uV2eYG_input"],
+html body[data-ds-dark-theme] [contenteditable="true"][class*="uV2eYG_input"] {
   background: transparent !important;
   background-image: none !important;
   border: 0 !important;
@@ -1286,8 +1293,10 @@ html body [role="tooltip"] {
   backdrop-filter: blur(10px);
 }
 
-/* 底部状态条上的小药丸（2 轮 35 步 / token 速度 / 缓存命中） */
-html body [class*="_pill"] {
+/* 底部状态条上的小药丸（2 轮 35 步 / token 速度 / 缓存命中）。
+   只认这个组件的类名 —— 写 [class*="_pill"] 会把插件页那对
+   「已安装 / 发现」分段页签也改成药丸，和 tablist 的凹槽叠成两层框。 */
+html body [class*="bOPqQW_pill"] {
   background-color: var(--kg-surface-weak) !important;
   border-radius: 999px !important;
   box-shadow: inset 0 0 0 1px var(--kg-rim) !important;
