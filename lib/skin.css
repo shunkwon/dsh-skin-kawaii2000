@@ -1451,6 +1451,23 @@ html body [role="tooltip"] {
   backdrop-filter: blur(10px);
 }
 
+/* 改动文件的悬停对比浮层（改动文件卡上悬停 500ms 出现的 HoverCard preview）。
+   这块内容是要逐行读的代码，可它的底色只来自 --dsw-alias-bg-layer-1，玻璃皮肤
+   把这个令牌调成了半透明（白天 0.74 / 夜间 0.70），于是浮层下面那 9 行文件列表
+   整片透上来：文件名、行号、代码三层的字叠在一起（2026-10-23 截图报的问题）。
+   浮层的 DOM 结构是「定位卡 > div[data-changes-hover-preview]」，底色画在外层
+   定位卡上；data-changes-hover-preview 是 dsh 给的稳定钩子（类名是
+   <哈希>_<本地名>，哈希随 dsh 构建变），所以用 :has() 认这个子节点，不写
+   [class*="_preview"] —— 那会连别的 preview 组件一起改。
+   配方同上面的菜单/弹窗：--kg-tint-solid 更实一点的玻璃 + 轻模糊。
+   preview 本来就比卡片左右各窄 24px，两侧仍看得到卡片，读起来还是「浮在卡上
+   的一片玻璃」，而不是把卡片挤开或盖成一块实心板。 */
+html body div:has(> [data-changes-hover-preview]) {
+  background-color: var(--kg-tint-solid) !important;
+  -webkit-backdrop-filter: blur(var(--kg-blur-soft)) saturate(var(--kg-sat));
+  backdrop-filter: blur(var(--kg-blur-soft)) saturate(var(--kg-sat));
+}
+
 /* 底部状态条上的小药丸（2 轮 35 步 / token 速度 / 缓存命中）。
    只认这个组件的类名 —— 写 [class*="_pill"] 会把插件页那对
    「已安装 / 发现」分段页签也改成药丸，和 tablist 的凹槽叠成两层框。 */
@@ -1532,12 +1549,14 @@ html body ::-webkit-scrollbar-corner {
   html body .pI_x6G_sidebarCol,
   html body .pI_x6G_centerCol,
   html body .pI_x6G_rightbarCol,
-  html body [class*="uV2eYG_card"] {
+  html body [class*="uV2eYG_card"],
+  html body div:has(> [data-changes-hover-preview]) {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
   }
   html body .pI_x6G_centerCol,
-  html body [class*="uV2eYG_card"] {
+  html body [class*="uV2eYG_card"],
+  html body div:has(> [data-changes-hover-preview]) {
     background-color: rgba(255, 255, 255, 0.92) !important;
   }
   html body .pI_x6G_sidebarCol {
@@ -1552,7 +1571,8 @@ html body ::-webkit-scrollbar-corner {
     background-image: none !important;
   }
   html body[data-ds-dark-theme] .pI_x6G_centerCol,
-  html body[data-ds-dark-theme] [class*="uV2eYG_card"] {
+  html body[data-ds-dark-theme] [class*="uV2eYG_card"],
+  html body[data-ds-dark-theme] div:has(> [data-changes-hover-preview]) {
     background-color: rgba(36, 37, 41, 0.92) !important;
   }
   html body[data-ds-dark-theme] .pI_x6G_sidebarCol {
