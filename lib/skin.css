@@ -1494,6 +1494,20 @@ html body ::-webkit-scrollbar-corner {
   html body .pI_x6G_sidebarCol {
     background-color: rgba(255, 255, 255, 0.86) !important;
   }
+  /* 夜间：上面三条带 !important 的白天值会压过夜间桌面和玻璃，正文 --kg-ink
+     又是近白，于是白底白字。多一个 [data-ds-dark-theme]（特异度更高）换回暗色：
+     桌面照搬夜间那条线性渐变（同样去掉色斑），面板用夜间 --kg-tint-solid 的
+     颜色，不透明度与白天两条一一对应。 */
+  html body[data-ds-dark-theme] {
+    background-image: linear-gradient(158deg, #17181b 0%, #131416 50%, #0f1012 100%) !important;
+  }
+  html body[data-ds-dark-theme] .pI_x6G_centerCol,
+  html body[data-ds-dark-theme] [class*="uV2eYG_card"] {
+    background-color: rgba(36, 37, 41, 0.92) !important;
+  }
+  html body[data-ds-dark-theme] .pI_x6G_sidebarCol {
+    background-color: rgba(36, 37, 41, 0.86) !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
