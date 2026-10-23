@@ -1245,7 +1245,7 @@ html body [class*="pXSMma_headline"] {
   font-family: var(--kg-font-display);
   letter-spacing: 0.02em;
 }
-html body [class*="pXSMma_workspace"],
+html body [class*="pXSMma_workspace"]:not([class*="Label"]),
 html body [class*="wSkVaW_heroWorkspaceRow"] > * {
   border-radius: var(--kg-r-sm) !important;
 }

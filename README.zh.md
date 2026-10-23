@@ -64,3 +64,13 @@ pnpm install
 ## License
 
 [MIT](./LICENSE)
+
+## 维护提示：`[class*=…]` 请只挂一层
+
+皮肤靠 `[class*="_xxx"]` 匹配组件内部类名（类名形如 `<hash>_<local>`，后缀稳定）。
+substring 匹配很容易命中嵌套子节点 —— 比如 `[class*="_card"]` 会同时命中
+`li.card` 和 `cardHead` / `cardMain` / `cardDesc` / `cardIcon`，给每一层都套上
+圆角描边，看起来像一条白条盖住了文字。
+
+改完样式后，在浏览器控制台粘 [tools/audit-nesting.js](./tools/audit-nesting.js)
+跑一遍（插件页、设置→内置插件、对话、首屏各跑一次），输出为空才算干净。
