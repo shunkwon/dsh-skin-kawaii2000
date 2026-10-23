@@ -33,6 +33,13 @@ Light | Dark
 - **Falls back gracefully.** `prefers-reduced-transparency` returns panes to
   solid fills, `prefers-reduced-motion` drops every transition.
 
+## Hover to open the sidebar
+
+The skin also adds one small behaviour: while the sidebar is collapsed, resting
+the mouse on the whale icon in the top-left corner (about 0.15 s) opens it, no
+click needed. It stays open; close it as before with the collapse button at the
+sidebar's top right or ⌥⌘B. Mouse only, so touch input is unaffected.
+
 ## Install
 
 Three steps:
