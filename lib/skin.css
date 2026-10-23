@@ -615,6 +615,10 @@ html body .pI_x6G_frame,
 html body [data-platform="darwin"] .pI_x6G_frame {
   background-color: transparent !important;
   background-image: none !important;
+  /* 整扇窗浮在极光上：四周留 14px 生底，玻璃才有「边界」可看。
+     注意这里只是**留边**，圆角归各面板自己（见下面三块）：
+     整扇统一裁切会把贴在角上的东西切掉 —— 窄窗口下面板的
+     「开始」页签本来就被应用摆在 x=-13（压在侧栏上），裁切会把它咬掉一半。 */
   padding: 14px !important;
   box-sizing: border-box !important;
 }
@@ -659,9 +663,16 @@ html body .pI_x6G_rightbarCol,
 html body [data-platform="darwin"] .pI_x6G_rightbarCol {
   background-color: var(--kg-tint) !important;
   background-image: none !important;
+  border-radius: 0 20px 20px 0 !important;
   box-shadow: inset 1px 0 0 var(--kg-rim) !important;
   -webkit-backdrop-filter: blur(var(--kg-blur)) saturate(1.6) !important;
   backdrop-filter: blur(var(--kg-blur)) saturate(1.6) !important;
+}
+
+/* 右栏打开时，画布不再是右边缘 —— 把右侧圆角交还给右栏，
+   否则两块接缝的上下角会各露出一个生底缺口。 */
+html body .pI_x6G_frame:not([style*="minmax(0px, 0px)"]) .pI_x6G_centerCol {
+  border-radius: 0 !important;
 }
 
 /* 折叠后的窄条也是玻璃，只是更白一点，否则图标直接坐在最饱和的糖色上 */
@@ -1033,17 +1044,32 @@ html body tbody tr:last-child td {
 html body tbody tr:hover td {
   background-color: var(--kg-surface-weak) !important;
 }
-html body [class*="_tableScroll"],
-html body [class*="_tableFill"] {
+/* 卡片必须挂在 table 上，不能挂在 _tableScroll / _tableFill 上：
+   那两个外壳永远撑满正文列宽，而表格本身是 max-content（还可能居中），
+   挂在外壳上就会得到一张比表格大一圈的空卡。 */
+html body table {
+  background-color: var(--kg-surface-weak) !important;
   border-radius: var(--kg-r-md) !important;
+  /* 表格自身的底色不会自己跟着圆角走，得靠裁切；表头/末行单元格
+     另有四角圆角兜着（见下），两层一起才没有方角露出来。 */
+  overflow: hidden;
   box-shadow:
     inset 0 0 0 1px var(--kg-rim),
     inset 0 1px 0 var(--kg-rim-top),
     var(--kg-shadow-1) !important;
-  background-color: var(--kg-surface-weak) !important;
-  background-image: none !important;
-  /* 不写 overflow:hidden —— 这两层里有一层是横向滚动容器，
-     改了宽表就滚不动；滚容器自己会按 border-radius 裁切内容。 */
+}
+/* 表头 / 末行的四个角跟着圆，否则单元格底色会从圆角里凸出来 */
+html body thead tr:first-child > th:first-child {
+  border-top-left-radius: var(--kg-r-md) !important;
+}
+html body thead tr:first-child > th:last-child {
+  border-top-right-radius: var(--kg-r-md) !important;
+}
+html body tbody tr:last-child > td:first-child {
+  border-bottom-left-radius: var(--kg-r-md) !important;
+}
+html body tbody tr:last-child > td:last-child {
+  border-bottom-right-radius: var(--kg-r-md) !important;
 }
 html body [class*="_tableScroll"] th:first-child,
 html body [class*="_tableScroll"] td:first-child {
