@@ -46,10 +46,17 @@ left. Its 56 px icon rail is gone, and the canvas glass fills the whole window.
 - The toggle stays on the same pixel whether the sidebar is open or closed. In
   the expanded sidebar it replaces the brand row (whale and wordmark), and the
   graphite *new session* button sits right below it.
-- The secondary header items (agent team, preset, open-in-Finder, ⋯) fade in
-  only while the pointer is in the top bar, focus is inside it or one of their
-  menus is open. On touch screens they stay visible. On narrow windows the
-  agent team / preset pair is dropped so the title keeps its room.
+- The *conversation / trajectory* tabs move up into the top bar, so the header
+  is a single 49 px row (79 px with the tab row before): title → tabs →
+  open-in-Finder / ⋯ → right-panel toggle. The tabs are not removed: the
+  trajectory view has no shortcut or command and the chosen view is remembered
+  per session, so without them a session left on *trajectory* could not get
+  back.
+- The secondary header items (agent team, preset, the tabs, open-in-Finder, ⋯)
+  fade in only while the pointer is in the top bar, focus is inside it or one
+  of their menus is open. On touch screens they stay visible. Below 760 px of
+  header width the agent team / preset pair is dropped, and below 520 px the
+  tabs return to a line of their own, so the title always keeps its room.
 
 How it works: dsh's layout already has this arrangement for its Windows desktop
 title bar. `lib/topbar.js` sets `data-windows-titlebar` on `<html>`, which

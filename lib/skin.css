@@ -1115,26 +1115,80 @@ html[data-kg-topbar] body .hHd-Xa_root:not(.hHd-Xa_collapsed) .hHd-Xa_logoRow {
   height: 36px !important;
 }
 
-/* 页头里次要的那几样 —— 标题后的「智能体团队」「标准模式」、右侧的「访达
-   打开」「⋯」—— 平时退成透明，指针进到顶栏、键盘聚焦进来、或者它们自己的
-   菜单开着时才显示。最右的右栏开关常驻。触屏没有悬停，一直显示。 */
+/* 「对话 / 轨迹」页签收进顶栏这一行，第二行整个去掉。
+   页头本来是两行网格：第一行标题行（标题、访达 / ⋯、右栏开关），第二行页签。
+   有页签时把标题行拍平（display: contents），整个页头改成一条 flex：
+   标题 → 页签 → 访达 / ⋯ → 右栏开关。标题行让位用的留白挪到标题上。
+   页签不能干脆删掉：轨迹没有快捷键也没有命令，视图又按会话记住，停在轨迹上的
+   会话会回不到对话。上下内边距 11 / 9：这一行中线落在 39px，和左上角按钮对齐。 */
+html[data-kg-topbar] body .wSkVaW_header:has([data-conversation-tabs]) {
+  display: flex !important;
+  align-items: center;
+  min-height: 0 !important;
+  padding-top: 11px !important;
+  padding-bottom: 9px !important;
+  container-type: inline-size;
+}
+/* 拍平后标题行没有盒子了，可它身上应用给的 container-type 还在，下面的
+   @container 会认它当最近的容器、量不出尺寸就永远不成立 —— 一并撤掉，让页头当容器 */
+html[data-kg-topbar] body .wSkVaW_header:has([data-conversation-tabs]) .wSkVaW_titleRow {
+  display: contents;
+  container-type: normal;
+}
+html[data-kg-topbar] body .wSkVaW_header:has([data-conversation-tabs]) .wSkVaW_titleCluster {
+  order: 1;
+  margin-inline-start: max(0px, calc(var(--dsh-frame-leading-clearance, 0px) - 20px));
+}
+html[data-kg-topbar] body .wSkVaW_header [data-conversation-tabs] {
+  order: 2;
+  flex: none;
+  margin: 0 0 0 12px !important;
+}
+html[data-kg-topbar] body .wSkVaW_header:has([data-conversation-tabs]) .wSkVaW_headerUtilities {
+  order: 3;
+}
+html[data-kg-topbar] body .wSkVaW_header:has([data-conversation-tabs]) .wSkVaW_headerCorner {
+  order: 4;
+}
+/* 窄了先收「智能体团队」「预设」（手机宽度上它们会把标题挤成 0 宽），再窄页签
+   退回自己那一行，标题始终留得出位置。尺寸容器：有页签时是页头（上面设的），
+   没有页签时是标题行（应用自己给它设了 container-type: inline-size）。 */
+@container (max-width: 760px) {
+  html[data-kg-topbar] body .wSkVaW_header .wSkVaW_headerActions {
+    display: none !important;
+  }
+}
+/* 容器查询改不了容器自己，所以 flex-wrap 常开（标题会先缩，宽的时候不会折行）；
+   窄的时候在右栏开关后面插一个占满整行的 ::before 当换行符，页签落到第二行。 */
+html[data-kg-topbar] body .wSkVaW_header:has([data-conversation-tabs]) {
+  flex-wrap: wrap;
+}
+@container (max-width: 520px) {
+  html[data-kg-topbar] body .wSkVaW_header:has([data-conversation-tabs])::before {
+    content: "";
+    order: 5;
+    flex: 0 0 100%;
+    height: 0;
+  }
+  html[data-kg-topbar] body .wSkVaW_header [data-conversation-tabs] {
+    order: 6;
+    margin: 8px 0 0 !important;
+  }
+}
+
+/* 页头里次要的那几样 —— 标题后的「智能体团队」「标准模式」、「对话 / 轨迹」
+   页签、右侧的「访达打开」「⋯」—— 平时退成透明，指针进到顶栏、键盘聚焦进来、
+   或者它们自己的菜单开着时才显示。最右的右栏开关常驻。触屏没有悬停，一直显示。 */
 @media (hover: hover) {
   html[data-kg-topbar] body .wSkVaW_headerActions,
-  html[data-kg-topbar] body .wSkVaW_headerUtilities {
+  html[data-kg-topbar] body .wSkVaW_headerUtilities,
+  html[data-kg-topbar] body [data-conversation-tabs] {
     opacity: 0;
     transition: opacity var(--kg-t);
   }
-  html[data-kg-topbar] body .wSkVaW_header:is(:hover, :focus-within) :is(.wSkVaW_headerActions, .wSkVaW_headerUtilities),
+  html[data-kg-topbar] body .wSkVaW_header:is(:hover, :focus-within) :is(.wSkVaW_headerActions, .wSkVaW_headerUtilities, [data-conversation-tabs]),
   html[data-kg-topbar] body :is(.wSkVaW_headerActions, .wSkVaW_headerUtilities):has([aria-expanded="true"]) {
     opacity: 1;
-  }
-}
-/* 窄窗口一行放不下时标题优先：标题后那串次要按钮整个收起（手机宽度上它们会把
-   标题挤成 0 宽）。标题行本身是尺寸容器（container-type: inline-size），按它的
-   内容宽度判断。 */
-@container (max-width: 480px) {
-  html[data-kg-topbar] body .wSkVaW_headerActions {
-    display: none !important;
   }
 }
 
@@ -1757,7 +1811,8 @@ html body ::-webkit-scrollbar-corner {
     transform: none !important;
   }
   html[data-kg-topbar] body .wSkVaW_headerActions,
-  html[data-kg-topbar] body .wSkVaW_headerUtilities {
+  html[data-kg-topbar] body .wSkVaW_headerUtilities,
+  html[data-kg-topbar] body [data-conversation-tabs] {
     transition: none !important;
   }
 }
