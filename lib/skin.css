@@ -692,6 +692,37 @@ html body .pI_x6G_bottomRow {
   backdrop-filter: blur(22px) saturate(1.6) !important;
 }
 
+/* 「面板 / 新标签页」是一层 off-canvas 覆盖层（P3OORG_panel），应用把它按
+   整窗尺寸铺在 frame 的 14px 生底之上、还带一层实色底（rgb(251,241,249)），
+   所以这个视图既没有生底边、四角也是直角。把它收进 14px、换成同一块玻璃，
+   里面那层实色底（_tabHost）清掉，这个视图就和其它视图对齐了。 */
+html body [class*="P3OORG_panel"] {
+  inset: 14px !important;
+  border: 0 !important;
+  border-radius: 20px !important;
+  background-color: var(--kg-tint-canvas) !important;
+  background-image:
+    radial-gradient(120% 90% at 50% 34%, var(--kg-veil-1) 0%, var(--kg-veil-2) 62%, var(--kg-veil-3) 100%),
+    linear-gradient(185deg, var(--kg-veil-top) 0%, rgba(255, 255, 255, 0) 60%) !important;
+  box-shadow:
+    inset 0 1px 0 var(--kg-rim),
+    inset 0 0 0 1px var(--kg-rim),
+    var(--kg-shadow-2) !important;
+  overflow: hidden;
+  -webkit-backdrop-filter: blur(34px) saturate(1.45);
+  backdrop-filter: blur(34px) saturate(1.45);
+}
+html body [class*="P3OORG_panelBody"],
+html body [class*="_tabHost"] {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+/* 页签条原本贴着窗口左边（x≈+1），收进 20px 圆角后会被咬掉一截 */
+html body [class*="_tabHostHeader"] {
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+}
+
 /* 会话视图自己不涂底色 —— 画布玻璃已经在那儿了 */
 html body .wSkVaW_root,
 html body .wSkVaW_body,
@@ -750,7 +781,11 @@ html body [class*="_toolBar"] button:hover {
   box-shadow: inset 0 0 0 1px var(--kg-rim) !important;
 }
 
-/* 输入类控件：透明玻璃井，不再有内阴影斜角 */
+/* 输入类控件：**不要自己画框**。
+   应用的模型是「外壳画框、input 透明」—— 搜索框就是 searchField(带边框)
+   > span.wrap > input(background: transparent; border: none)。我给 input
+   加底色 + 内描边，就变成框里还有一个框。所以这里把 input 还原成透明的，
+   边框、圆角、聚焦高亮都交给外壳。 */
 html body input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
 html body textarea,
 html body select,
@@ -758,29 +793,16 @@ html body [contenteditable="true"] {
   border-width: 0 !important;
   border-style: none !important;
   border-radius: var(--kg-r-sm) !important;
-  background-color: var(--dsw-specific-input-major) !important;
-  box-shadow: inset 0 0 0 1px rgba(158, 96, 150, 0.16) !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  outline: none !important;
   color: var(--kg-ink);
   font-family: var(--dsw-font-family);
-  transition: box-shadow var(--kg-t), background-color var(--kg-t);
 }
-html body[data-ds-dark-theme] input,
-html body[data-ds-dark-theme] textarea,
-html body[data-ds-dark-theme] [contenteditable="true"] {
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14) !important;
-}
-html body input:hover:not(:focus),
-html body textarea:hover:not(:focus) {
-  box-shadow: inset 0 0 0 1px rgba(158, 96, 150, 0.26) !important;
-}
-html body input:focus,
-html body textarea:focus,
-html body select:focus,
-html body [contenteditable="true"]:focus {
-  outline: none !important;
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 92, 158, 0.55),
-    0 0 0 3px rgba(255, 92, 158, 0.14) !important;
+html body input::placeholder,
+html body textarea::placeholder {
+  color: var(--kg-dim);
 }
 
 html body :focus-visible {
@@ -947,13 +969,15 @@ html body [role="tab"]::before {
 /* --------------------------------------------------------------------------
    8. 对话 — 正文、表格、代码、气泡
    -------------------------------------------------------------------------- */
+/* 正文不要写死字号 —— 设置里的「字号大小」是用户定的（当前 16px），
+   写死 14.5px 会和按 16px 渲染的标记行/列表挤在一起，看起来像要重叠。
+   只给单位无关的行高，字号继承应用。 */
 html body p,
 html body li,
 html body dd,
 html body blockquote {
   font-family: var(--dsw-font-family);
-  font-size: 14.5px;
-  line-height: 1.78;
+  line-height: 1.8;
 }
 
 html body h1,
@@ -967,9 +991,10 @@ html body h6 {
   letter-spacing: 0.012em;
   color: var(--kg-ink);
 }
-html body h1 { font-size: 23px; line-height: 1.4; }
-html body h2 { font-size: 19px; line-height: 1.45; }
-html body h3 { font-size: 16.5px; line-height: 1.5; }
+/* 标题只换字体和字重，字号仍走应用的阶梯（这样也会跟着「字号大小」缩放） */
+html body h1 { line-height: 1.38; }
+html body h2 { line-height: 1.44; }
+html body h3 { line-height: 1.5; }
 
 html body strong,
 html body b,
