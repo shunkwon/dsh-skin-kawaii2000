@@ -1448,6 +1448,14 @@ html body [class*="O_Ebla_root"] {
     inset 0 0 0 1px var(--kg-rim),
     var(--kg-shadow-1) !important;
 }
+/* 过程步骤（「已完成分析」那一行）在应用里不是卡片、自己没有内边距；
+   上面这条给它加了圈和影，就得补上，否则图标贴着圆角。
+   与用户气泡同半径同描边，内边距也取气泡的 10px 16px。
+   :not([hidden])：外层「已完成，用时 N 秒」收起时它是 hidden="until-found"
+   （content-visibility: hidden，盒子还在），内边距会撑出一条 20px 的空框。 */
+html body [class*="O_Ebla_root"]:not([hidden]) {
+  padding: 10px 16px !important;
+}
 
 /* --------------------------------------------------------------------------
    11. 滚动条 — 细的悬浮灰条
