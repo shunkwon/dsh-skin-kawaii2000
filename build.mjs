@@ -1,7 +1,7 @@
-// 把 lib/skin.css、lib/sidebar-hover.js、lib/topbar.js 和 lib/tooltip-fix.js 打成 dsh 客户端插件 bundle(lib/client.js)。
+// 把 lib/skin.css、lib/sidebar-peek.js、lib/topbar.js 和 lib/tooltip-fix.js 打成 dsh 客户端插件 bundle(lib/client.js)。
 // dsh 的客户端模块系统是「惰性 CJS 表」:执行 bundle 只登记 factory,
 // 所有副作用(含 CSS 注入)发生在 factory 体内、materialize 的时候;
-// 悬浮监听和顶栏模式则挂在 apply(ctx) 的 ctx.effect 里,插件卸载时跟着撤掉。
+// 边缘呼出、提示归位和顶栏模式则挂在 apply(ctx) 的 ctx.effect 里,插件卸载时跟着撤掉。
 // 顶栏模式在 factory 里还会先开一次:布局读这个属性决定收起列宽,要赶在它第一次渲染前。
 // 改完跑 `node build.mjs`,然后重启 dsh。
 import { readFileSync, writeFileSync } from 'node:fs'
@@ -19,7 +19,7 @@ const inline = file => readFileSync(join(here, 'lib', file), 'utf8')
   .split('\n')
   .map(line => (line ? `\t\t${line}` : line))
   .join('\n')
-const hover = inline('sidebar-hover.js')
+const peek = inline('sidebar-peek.js')
 const topbar = inline('topbar.js')
 const tooltipFix = inline('tooltip-fix.js')
 
@@ -40,8 +40,8 @@ const bundle = `window.__ModuleLoader__.load({
 \t\t\tdocument.head.appendChild(tag);
 \t\t}
 \t\t//#endregion
-\t\t//#region lib/sidebar-hover.js
-${hover}
+\t\t//#region lib/sidebar-peek.js
+${peek}
 \t\t//#endregion
 \t\t//#region lib/topbar.js
 ${topbar}
@@ -51,12 +51,12 @@ ${topbar}
 ${tooltipFix}
 \t\t//#endregion
 \t\t//#region lib/client.js
-\t\t/** Client half of the skin plugin: the stylesheet, the top-bar layout, tooltips placed back inside the glass panes, and hover-to-open for the collapsed sidebar. */
+\t\t/** Client half of the skin plugin: the stylesheet, the top-bar layout, tooltips placed back inside the glass panes, and the sidebar that peeks out from the left edge. */
 \t\tfunction apply(ctx) {
 \t\t\tif (typeof document === "undefined") return;
 \t\t\tctx.effect(() => installTopbar(document), "kawaii2000: top bar");
 \t\t\tctx.effect(() => installTooltipFix(document), "kawaii2000: tooltips inside glass panes");
-\t\t\tctx.effect(() => installSidebarHover(document), "kawaii2000: hover opens sidebar");
+\t\t\tctx.effect(() => installSidebarPeek(document), "kawaii2000: sidebar peeks from the left edge");
 \t\t}
 \t\t//#endregion
 \t\texports.apply = apply;

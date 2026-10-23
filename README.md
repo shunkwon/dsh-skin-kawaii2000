@@ -38,14 +38,15 @@ Light | Dark
 Laid out like Claude Code: a collapsed sidebar leaves nothing behind on the
 left. Its 56 px icon rail is gone, and the canvas glass fills the whole window.
 
-- The top-left corner holds two ghost buttons: the sidebar toggle and *new
-  session*. They share the conversation header's row, and the session title
-  moves right to make room for them, so the header is the top bar.
+- The top-left corner holds one ghost button, *new session* (touch screens also
+  get the sidebar toggle in front of it). It shares the conversation header's
+  row, and the session title moves right to make room, so the header is the
+  top bar.
 - Everything else from the rail (plugins, automations, workspace tools,
   balance, settings) lives only in the expanded sidebar.
-- The toggle stays on the same pixel whether the sidebar is open or closed. In
-  the expanded sidebar it replaces the brand row (whale and wordmark), and the
-  graphite *new session* button sits right below it.
+- The expanded sidebar has no brand row (whale and wordmark) any more: the
+  graphite *new session* button goes right to the top, on the same line as the
+  header's title row.
 - The *conversation / trajectory* tabs move up into the top bar, so the header
   is a single 49 px row (79 px with the tab row before): title → tabs →
   open-in-Finder / ⋯ → right-panel toggle. The tabs are not removed: the
@@ -81,12 +82,31 @@ an edge back inside the pane. To place one tooltip by hand in pane coordinates
 (as the expanded sidebar toggle does), use `translate: none !important`. Menus
 use CSS anchor positioning and are unaffected.
 
-## Hover to open the sidebar
+## Pull the sidebar from the left edge
 
-The skin also adds one small behaviour: while the sidebar is collapsed, resting
-the mouse on the sidebar toggle in the top-left corner (about 0.15 s) opens it,
-no click needed. It stays open; close it as before with the same toggle or
-⌥⌘B. Mouse only, so touch input is unaffected.
+With a mouse there is no sidebar toggle button; the sidebar comes out of the
+window's left edge instead:
+
+- **Peek:** rest the pointer on the left edge (the margin around the window)
+  for about 0.12 s and the sidebar slides out as a floating pane of glass over
+  the content, which does not move. A short vertical bar lights up in the
+  margin as the pointer approaches, to show where it comes from.
+- **Retract:** move off the sidebar (24 px past its right edge still counts as
+  on it) for about 0.3 s and it slides back. It stays out while a menu opened
+  from it is showing, while you type in its search box, and while a mouse
+  button is held.
+- **Pin:** press ⌥⌘B while it is out. The content moves aside and the sidebar
+  stays, as an expanded sidebar always did; ⌥⌘B again collapses it. The
+  shortcut is read from the app's own binding, so a remapped one works too.
+- Touch screens have no hover, so they keep the sidebar toggle in the top-left
+  corner.
+
+It lives in `lib/sidebar-peek.js`. A peek clicks the hidden toggle for you and
+sets `data-kg-peek` on `<html>`. `skin.css` then gives the canvas a negative
+margin as wide as the sidebar column, so the canvas covers that column again.
+The margin and the column width run on the same transition, so the content
+stays put as the sidebar slides in and out. `data-kg-peek` comes off only once
+the collapse animation has finished.
 
 ## Install
 

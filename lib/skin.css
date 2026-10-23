@@ -991,7 +991,10 @@ html body [class*="bhn1Oq_treeBody"] {
    它们的宽度（--dsh-frame-leading-clearance，页头的标题行本来就读它）。
 
    定位参照始终是侧栏列（contain: layout）：展开时它 280 宽，收起时 0 宽，
-   左上角都在窗口留边那个点上，所以开关两种状态落在屏幕同一处，展开收起不跳。
+   左上角都在窗口留边那个点上，所以按钮两种状态落在屏幕同一处，展开收起不跳。
+
+   用鼠标时没有侧栏开关：碰窗口左边缘，侧栏浮出盖在正文上（data-kg-peek，
+   lib/sidebar-peek.js），⌥⌘B 钉住 / 收起。触屏没有悬停，开关照常显示。
    -------------------------------------------------------------------------- */
 html[data-kg-topbar] body {
   --kg-topbar-btn: 32px;
@@ -1001,18 +1004,54 @@ html[data-kg-topbar] body {
   --kg-topbar-x: 12px;
   --kg-topbar-y: 9px;
   --kg-topbar-gap: 4px;
+  /* 开关占掉的那一截；用鼠标时开关藏起来，这一截归零，新会话挪到最左 */
+  --kg-topbar-toggle-space: calc(var(--kg-topbar-btn) + var(--kg-topbar-gap));
+}
+@media (hover: hover) and (pointer: fine) {
+  html[data-kg-topbar] body {
+    --kg-topbar-toggle-space: 0px;
+  }
+  html[data-kg-topbar] body .hHd-Xa_toggle {
+    display: none !important;
+  }
+  /* 展开（钉住或浮出）时侧栏顶上那一行本来是给开关的：整行去掉，「新会话」
+     主按钮顶上来，正好和页头标题行同一条中线 */
+  html[data-kg-topbar] body .hHd-Xa_root:not(.hHd-Xa_collapsed) .hHd-Xa_logoRow {
+    display: none !important;
+  }
+  html[data-kg-topbar] body .hHd-Xa_root:not(.hHd-Xa_collapsed) .hHd-Xa_newSession {
+    margin-top: 0 !important;
+  }
 }
 
-/* Windows 桌面版在所有列上方画的那条标题栏色带：这里没有单独的标题栏 */
+/* Windows 桌面版在所有列上方画的那条标题栏色带：这里没有单独的标题栏。
+   这个伪元素改作左边缘的提示条：指针靠近左边缘（data-kg-edge）时在留边里
+   亮出一道竖短条，告诉你从这里能拉出侧栏。 */
 html[data-kg-topbar] body .pI_x6G_frame::before {
-  content: none !important;
+  content: "" !important;
+  position: absolute !important;
+  inset: auto !important;
+  left: calc(var(--kg-window-inset) / 2 - 2px) !important;
+  top: calc(50% - 28px) !important;
+  width: 4px !important;
+  height: 56px !important;
+  border-radius: 2px;
+  background: var(--kg-hair-strong) !important;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 4;
+  transition: opacity var(--kg-t);
+  -webkit-app-region: no-drag;
+}
+html[data-kg-topbar][data-kg-edge] body .pI_x6G_frame::before {
+  opacity: 1;
 }
 
 html[data-kg-topbar] body .pI_x6G_sidebarCol {
   contain: layout;
 }
 
-/* 收起：列宽 0，只剩两颗固定定位的按钮。不放开 overflow 它们会被这条 0 宽的
+/* 收起：列宽 0，只剩固定定位的按钮（新会话；触屏上还有开关）。不放开 overflow 它们会被这条 0 宽的
    列裁掉；z-index 让它们压在画布玻璃上面。收起动画还在走的时候保留侧栏玻璃，
    读起来是面板缩回去；停下来后连投影一起去掉，否则 0 宽的列还会在画布左缘
    留一道投影细线。 */
@@ -1025,7 +1064,7 @@ html[data-kg-topbar] body .pI_x6G_frame[data-sidebar-collapsed]:not([data-animat
   box-shadow: none !important;
 }
 
-/* 全屏面板盖住整扇窗，左上角是它自己的页签条：两颗按钮让它盖住，不浮在页签上。
+/* 全屏面板盖住整扇窗，左上角是它自己的页签条：左上角的按钮让它盖住，不浮在页签上。
    宽度再扣掉展开的侧栏（布局只扣了侧栏宽，没扣两侧生底），免得压到侧栏上。 */
 html[data-kg-topbar] body .pI_x6G_frame[data-rightbar-fullscreen] .pI_x6G_sidebarCol {
   z-index: auto;
@@ -1045,9 +1084,40 @@ html[data-kg-topbar] body .pI_x6G_frame[data-sidebar-collapsed]:not([style*="min
   border-radius: 20px 0 0 20px !important;
 }
 
-/* 页头标题给左上角两颗按钮让位：按钮右缘再空 12px */
-html[data-kg-topbar] body .pI_x6G_frame[data-sidebar-collapsed] {
-  --dsh-frame-leading-clearance: calc(var(--kg-topbar-x) + 2 * var(--kg-topbar-btn) + var(--kg-topbar-gap) + 12px);
+/* 页头标题给左上角的按钮让位：按钮右缘再空 12px。侧栏浮出时正文不动，
+   标题也不能跟着侧栏展开挪回去 */
+html[data-kg-topbar] body .pI_x6G_frame[data-sidebar-collapsed],
+html[data-kg-topbar][data-kg-peek] body .pI_x6G_frame {
+  --dsh-frame-leading-clearance: calc(var(--kg-topbar-x) + var(--kg-topbar-toggle-space) + var(--kg-topbar-btn) + 12px);
+}
+
+/* 浮出：应用已经把侧栏展开成 280 宽的一列，画布用等宽的负 margin 盖回去，
+   盒子和收起时一模一样，正文不重排。margin 跟列宽走同一条过渡（布局的
+   data-animating 用的就是这两个变量），滑出、收回时正文纹丝不动；钉住时摘掉
+   data-kg-peek，margin 过渡回 0，正文这才让开。 */
+html[data-kg-topbar] body .pI_x6G_centerCol {
+  transition: margin-left var(--ds-transition-duration-slow) var(--ds-ease-in-out);
+}
+html[data-kg-topbar] body .pI_x6G_frame[data-dragging] .pI_x6G_centerCol {
+  transition: none;
+}
+html[data-kg-topbar][data-kg-peek] body .pI_x6G_frame .pI_x6G_centerCol {
+  margin-left: calc(-1 * var(--dsh-windows-sidebar-width, 0px));
+  border-radius: 20px !important;
+}
+html[data-kg-topbar][data-kg-peek] body .pI_x6G_frame:not([style*="minmax(0px, 0px)"]) .pI_x6G_centerCol {
+  border-radius: 20px 0 0 20px !important;
+}
+/* 浮出的侧栏是一块单独浮起的玻璃：四角都圆，右侧一团更重的投影把它和底下
+   的正文分开 */
+html[data-kg-topbar][data-kg-peek] body .pI_x6G_frame .pI_x6G_sidebarCol {
+  z-index: 3;
+  border-radius: 20px !important;
+  box-shadow:
+    inset -1px 0 0 var(--kg-rim),
+    inset 1px 1px 0 var(--kg-rim-top),
+    0 0 0 0.5px var(--kg-outline),
+    var(--kg-shadow-3) !important;
 }
 
 /* 开关：两种状态都是顶栏最左边那颗按钮。只用面板图标，鲸鱼不再出现 */
@@ -1072,7 +1142,7 @@ html[data-kg-topbar] body .hHd-Xa_toggle .hHd-Xa_panelIcon {
 html[data-kg-topbar] body .hHd-Xa_collapsed .hHd-Xa_newSession {
   position: fixed !important;
   top: var(--kg-topbar-y) !important;
-  left: calc(var(--kg-topbar-x) + var(--kg-topbar-btn) + var(--kg-topbar-gap)) !important;
+  left: calc(var(--kg-topbar-x) + var(--kg-topbar-toggle-space)) !important;
   width: var(--kg-topbar-btn) !important;
   height: var(--kg-topbar-btn) !important;
   margin: 0 !important;
@@ -1090,8 +1160,8 @@ html[data-kg-topbar] body .hHd-Xa_collapsed .hHd-Xa_newSession:hover {
   color: var(--kg-ink) !important;
 }
 
-/* 开关的提示：展开时朝右，落在品牌行空出来的那一截里；朝下（标题栏模式的
-   默认）会正好盖在「新会话」主按钮上。收起时下方是空的画布，照旧朝下。
+/* 开关（只在触屏上显示）的提示：展开时朝右，落在品牌行空出来的那一截里；朝下
+   （标题栏模式的默认）会正好盖在「新会话」主按钮上。收起时下方是空的画布，照旧朝下。
    这里直接按侧栏列的坐标摆，所以 tooltip-fix.js 写的原点补偿要压掉。 */
 html[data-kg-topbar] body .hHd-Xa_root:not(.hHd-Xa_collapsed) .hHd-Xa_logoRow > [role="tooltip"] {
   left: calc(var(--kg-topbar-x) + var(--kg-topbar-btn) + 8px) !important;
@@ -1812,7 +1882,9 @@ html body ::-webkit-scrollbar-corner {
   }
   html[data-kg-topbar] body .wSkVaW_headerActions,
   html[data-kg-topbar] body .wSkVaW_headerUtilities,
-  html[data-kg-topbar] body [data-conversation-tabs] {
+  html[data-kg-topbar] body [data-conversation-tabs],
+  html[data-kg-topbar] body .pI_x6G_centerCol,
+  html[data-kg-topbar] body .pI_x6G_frame::before {
     transition: none !important;
   }
 }
