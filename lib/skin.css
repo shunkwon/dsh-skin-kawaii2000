@@ -27,10 +27,14 @@ html body {
   --kg-blur: 30px;              /* 侧栏/画布的磨砂半径 */
   --kg-blur-soft: 20px;         /* 浮层 */
   --kg-sat: 1.15;               /* backdrop 饱和度：只略提一点，别把背后的颜色放大 */
+  /* 整扇窗四周留出的生底宽度 = frame 的 padding。全屏面板要收进这条边时也用
+     这个值算宽度，改一处两边一起变。 */
+  --kg-window-inset: 14px;
   /* —— 玻璃「透明层」配方：白天是中性白，夜间翻成石墨 —— */
   --kg-tint: rgba(255, 255, 255, 0.46);   /* 侧栏玻璃 */
   --kg-tint-canvas: rgba(255, 255, 255, 0.68); /* 正文画布玻璃 */
   --kg-tint-solid: rgba(252, 252, 253, 0.86);  /* 需要读字的浮层 */
+  --kg-tint-opaque: rgb(252, 252, 253);        /* 盖住整窗内容的全屏面板底：实色，不玩透 */
   --kg-rim: rgba(255, 255, 255, 0.55);    /* 内侧亮边 */
   --kg-rim-top: rgba(255, 255, 255, 0.85);/* 内顶高光 */
   --kg-outline: rgba(0, 0, 0, 0.07);      /* 浮起来的面外侧的发丝线 */
@@ -350,6 +354,7 @@ html body[data-ds-dark-theme] {
   --kg-tint: rgba(255, 255, 255, 0.06);
   --kg-tint-canvas: rgba(255, 255, 255, 0.05);
   --kg-tint-solid: rgba(36, 37, 41, 0.9);
+  --kg-tint-opaque: rgb(36, 37, 41);
   --kg-rim: rgba(255, 255, 255, 0.1);
   --kg-rim-top: rgba(255, 255, 255, 0.16);
   --kg-outline: rgba(0, 0, 0, 0.4);
@@ -642,7 +647,7 @@ html body [data-platform="darwin"] .pI_x6G_frame {
      注意这里只是**留边**，圆角归各面板自己（见下面三块）：
      整扇统一裁切会把贴在角上的东西切掉 —— 窄窗口下面板的
      「开始」页签本来就被应用摆在 x=-13（压在侧栏上），裁切会把它咬掉一半。 */
-  padding: 14px !important;
+  padding: var(--kg-window-inset) !important;
   box-sizing: border-box !important;
 }
 
@@ -726,8 +731,13 @@ html body .pI_x6G_bottomRow {
    它有两种摆法，别一把梭：
      · 有右栏时：它就在右栏里（已经被列宽对齐了），只需要把右侧圆角接过来、
        别再拿自己的实色底糊住右栏的玻璃；
-     · 窄窗全屏时（frame 带 data-rightbar-fullscreen）：它按整窗尺寸铺在
-       14px 生底之上，得自己收进 14px、四角都圆。
+     · 全屏时（frame 带 data-rightbar-fullscreen）：应用给它内联 width:100vw，
+       但它的包含块是右栏那一列（P3OORG_panel 本身就是 position:absolute;
+       right:0），不是窗口。于是 inset 的 left 从右栏左缘量起，再叠上 100vw 的
+       宽度，面板就被推到右栏右缘之外：内容仍按整窗宽度居中，右侧却被窗口裁掉
+       ——「开始」页的卡片只剩左边一截、罗盘整个跑到窗外，就是这么来的。
+       修法：不动 right:0（右栏右缘 = 窗口右缘 - 生底），只用 width 把面板收回
+       整窗的生底以内，left 交给 auto。
    应用给它铺了一层实色底 rgb(251,241,249)，那是它「不像玻璃」的主因。 */
 html body [class*="P3OORG_panel"] {
   border: 0 !important;
@@ -735,10 +745,16 @@ html body [class*="P3OORG_panel"] {
   background-color: transparent !important;
   background-image: none !important;
 }
-html body .pI_x6G_frame[data-rightbar-fullscreen] [class*="P3OORG_panel"] {
-  inset: 14px !important;
+/* 全屏面板：内联的 100vw 要压过（否则右侧多出两个生底导致横向溢出），
+   宽度改成整窗减两侧生底，落位正好是「整窗收进 14px、四角自己圆」。
+   它盖住的是整窗内容（不是桌面）：半透明会把身后的对话原样透成一层水印，
+   而且父级右栏自己也带 backdrop-filter，面板自己的背景模糊在这里不生效，
+   透出来还是清晰的 —— 所以底色用实色，玻璃感交给四周亮边、投影和白纱。 */
+html body .pI_x6G_frame[data-rightbar-fullscreen] [data-sidebar-right-panel] {
+  inset: 0 0 0 auto !important;
+  width: calc(100vw - 2 * var(--kg-window-inset)) !important;
   border-radius: 20px !important;
-  background-color: var(--kg-tint-canvas) !important;
+  background-color: var(--kg-tint-opaque) !important;
   background-image:
     radial-gradient(120% 90% at 50% 34%, var(--kg-veil-1) 0%, var(--kg-veil-2) 62%, var(--kg-veil-3) 100%),
     linear-gradient(185deg, var(--kg-veil-top) 0%, rgba(255, 255, 255, 0) 60%) !important;
@@ -761,7 +777,7 @@ html body[data-ds-dark-theme] .pI_x6G_rightbarCol,
 html body[data-ds-dark-theme] .pI_x6G_bottomRow,
 html body[data-ds-dark-theme] .wSkVaW_header,
 html body[data-ds-dark-theme] [class*="uV2eYG_card"],
-html body[data-ds-dark-theme] .pI_x6G_frame[data-rightbar-fullscreen] [class*="P3OORG_panel"] {
+html body[data-ds-dark-theme] .pI_x6G_frame[data-rightbar-fullscreen] [data-sidebar-right-panel] {
   background-image: none !important;
 }
 
