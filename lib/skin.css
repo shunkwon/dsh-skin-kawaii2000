@@ -27,9 +27,11 @@ html body {
   --kg-blur: 30px;              /* 侧栏/画布的磨砂半径 */
   --kg-blur-soft: 20px;         /* 浮层 */
   --kg-sat: 1.15;               /* backdrop 饱和度：只略提一点，别把背后的颜色放大 */
-  /* 整扇窗四周留出的生底宽度 = frame 的 padding。全屏面板要收进这条边时也用
-     这个值算宽度，改一处两边一起变。 */
-  --kg-window-inset: 14px;
+  /* 整扇窗四周留出的生底宽度 = frame 的 padding；全屏面板要收进这条边时也用
+     这个值算宽度。3.1 起应用贴满窗口、不再浮在桌面上（像 Claude Code），
+     留边和窗口圆角都归零；想要回浮窗的样子，把这两个改回 14px / 20px。 */
+  --kg-window-inset: 0px;
+  --kg-window-radius: 0px;
   /* —— 玻璃「透明层」配方：白天是中性白，夜间翻成石墨 —— */
   --kg-tint: rgba(255, 255, 255, 0.46);   /* 侧栏玻璃 */
   --kg-tint-canvas: rgba(255, 255, 255, 0.68); /* 正文画布玻璃 */
@@ -643,7 +645,7 @@ html body .pI_x6G_frame,
 html body [data-platform="darwin"] .pI_x6G_frame {
   background-color: transparent !important;
   background-image: none !important;
-  /* 整扇窗浮在桌面上：四周留 14px 生底，玻璃才有「边界」可看。
+  /* 四周留 --kg-window-inset 宽的生底（现在是 0，应用贴满窗口）。
      注意这里只是**留边**，圆角归各面板自己（见下面三块）：
      整扇统一裁切会把贴在角上的东西切掉 —— 窄窗口下面板的
      「开始」页签本来就被应用摆在 x=-13（压在侧栏上），裁切会把它咬掉一半。 */
@@ -661,7 +663,7 @@ html body [data-platform="darwin"] .pI_x6G_sidebarCol {
     var(--kg-side-3) 100%
   ) !important;
   border-right: 0 !important;
-  border-radius: 20px 0 0 20px !important;
+  border-radius: var(--kg-window-radius) 0 0 var(--kg-window-radius) !important;
   box-shadow:
     inset -1px 0 0 var(--kg-rim),
     inset 1px 1px 0 var(--kg-rim-top),
@@ -677,7 +679,7 @@ html body [data-platform="darwin"] .pI_x6G_centerCol {
     radial-gradient(120% 90% at 50% 34%, var(--kg-veil-1) 0%, var(--kg-veil-2) 62%, var(--kg-veil-3) 100%),
     linear-gradient(185deg, var(--kg-veil-top) 0%, rgba(255, 255, 255, 0) 60%) !important;
   border-left: 0 !important;
-  border-radius: 0 20px 20px 0 !important;
+  border-radius: 0 var(--kg-window-radius) var(--kg-window-radius) 0 !important;
   box-shadow:
     inset 1px 0 0 var(--kg-rim),
     inset 0 1px 0 var(--kg-rim),
@@ -695,7 +697,7 @@ html body [data-platform="darwin"] .pI_x6G_rightbarCol {
   background-image:
     radial-gradient(120% 90% at 50% 34%, var(--kg-veil-1) 0%, var(--kg-veil-2) 62%, var(--kg-veil-3) 100%),
     linear-gradient(185deg, var(--kg-veil-top) 0%, rgba(255, 255, 255, 0) 60%) !important;
-  border-radius: 0 20px 20px 0 !important;
+  border-radius: 0 var(--kg-window-radius) var(--kg-window-radius) 0 !important;
   box-shadow:
     inset 1px 0 0 var(--kg-rim),
     inset 0 1px 0 var(--kg-rim),
@@ -719,7 +721,7 @@ html body [data-sidebar-collapsed] .pI_x6G_sidebarCol {
 html body .pI_x6G_bottomRow {
   background-color: var(--kg-rail-base) !important;
   background-image: linear-gradient(180deg, var(--kg-rail-1) 0%, var(--kg-rail-2) 100%) !important;
-  border-radius: 0 0 20px 20px !important;
+  border-radius: 0 0 var(--kg-window-radius) var(--kg-window-radius) !important;
   box-shadow:
     inset 0 1px 0 var(--kg-rim),
     inset 0 0 0 1px var(--kg-rim) !important;
@@ -741,7 +743,7 @@ html body .pI_x6G_bottomRow {
    应用给它铺了一层实色底 rgb(251,241,249)，那是它「不像玻璃」的主因。 */
 html body [class*="P3OORG_panel"] {
   border: 0 !important;
-  border-radius: 0 20px 20px 0 !important;
+  border-radius: 0 var(--kg-window-radius) var(--kg-window-radius) 0 !important;
   background-color: transparent !important;
   background-image: none !important;
 }
@@ -753,7 +755,7 @@ html body [class*="P3OORG_panel"] {
 html body .pI_x6G_frame[data-rightbar-fullscreen] [data-sidebar-right-panel] {
   inset: 0 0 0 auto !important;
   width: calc(100vw - 2 * var(--kg-window-inset)) !important;
-  border-radius: 20px !important;
+  border-radius: var(--kg-window-radius) !important;
   background-color: var(--kg-tint-opaque) !important;
   background-image:
     radial-gradient(120% 90% at 50% 34%, var(--kg-veil-1) 0%, var(--kg-veil-2) 62%, var(--kg-veil-3) 100%),
@@ -992,7 +994,8 @@ html body [class*="bhn1Oq_treeBody"] {
    开关，标题让出它的宽度（--dsh-frame-leading-clearance，页头的标题行本来就读它）。
 
    定位参照始终是侧栏列（contain: layout）：展开时它 280 宽，收起时 0 宽，
-   左上角都在窗口留边那个点上，所以按钮两种状态落在屏幕同一处，展开收起不跳。
+   左上角都在窗口左上角（再加上留边，现在是 0），所以按钮两种状态落在屏幕
+   同一处，展开收起不跳。
 
    用鼠标时没有侧栏开关：碰窗口左边缘，侧栏浮出盖在正文上（data-kg-peek，
    lib/sidebar-peek.js），⌥⌘B 钉住 / 收起。触屏没有悬停，开关照常显示。
@@ -1027,13 +1030,13 @@ html[data-kg-topbar] body {
 }
 
 /* Windows 桌面版在所有列上方画的那条标题栏色带：这里没有单独的标题栏。
-   这个伪元素改作左边缘的提示条：指针靠近左边缘（data-kg-edge）时在留边里
-   亮出一道竖短条，告诉你从这里能拉出侧栏。 */
+   这个伪元素改作左边缘的提示条：指针靠近左边缘（data-kg-edge）时贴着窗口
+   左边亮出一道竖短条，告诉你从这里能拉出侧栏。 */
 html[data-kg-topbar] body .pI_x6G_frame::before {
   content: "" !important;
   position: absolute !important;
   inset: auto !important;
-  left: calc(var(--kg-window-inset) / 2 - 2px) !important;
+  left: calc(var(--kg-window-inset) + 3px) !important;
   top: calc(50% - 28px) !important;
   width: 4px !important;
   height: 56px !important;
@@ -1075,15 +1078,15 @@ html[data-kg-topbar] body .pI_x6G_frame[data-rightbar-fullscreen] [data-sidebar-
   max-width: calc(100vw - 2 * var(--kg-window-inset) - var(--dsh-windows-sidebar-width, 0px)) !important;
 }
 html[data-kg-topbar] body .pI_x6G_frame[data-rightbar-fullscreen]:not([data-sidebar-collapsed]) [data-sidebar-right-panel] {
-  border-radius: 0 20px 20px 0 !important;
+  border-radius: 0 var(--kg-window-radius) var(--kg-window-radius) 0 !important;
 }
 
 /* 收起后画布就是整扇窗：四角都圆；右栏打开时右侧两个角交给右栏 */
 html[data-kg-topbar] body .pI_x6G_frame[data-sidebar-collapsed] .pI_x6G_centerCol {
-  border-radius: 20px !important;
+  border-radius: var(--kg-window-radius) !important;
 }
 html[data-kg-topbar] body .pI_x6G_frame[data-sidebar-collapsed]:not([style*="minmax(0px, 0px)"]) .pI_x6G_centerCol {
-  border-radius: 20px 0 0 20px !important;
+  border-radius: var(--kg-window-radius) 0 0 var(--kg-window-radius) !important;
 }
 
 /* 页头标题给左上角的按钮让位（没有按钮时是 0）。侧栏浮出时正文不动，
@@ -1105,16 +1108,22 @@ html[data-kg-topbar] body .pI_x6G_frame[data-dragging] .pI_x6G_centerCol {
 }
 html[data-kg-topbar][data-kg-peek] body .pI_x6G_frame .pI_x6G_centerCol {
   margin-left: calc(-1 * var(--dsh-windows-sidebar-width, 0px));
-  border-radius: 20px !important;
+  border-radius: var(--kg-window-radius) !important;
 }
 html[data-kg-topbar][data-kg-peek] body .pI_x6G_frame:not([style*="minmax(0px, 0px)"]) .pI_x6G_centerCol {
-  border-radius: 20px 0 0 20px !important;
+  border-radius: var(--kg-window-radius) 0 0 var(--kg-window-radius) !important;
 }
-/* 浮出的侧栏是一块单独浮起的玻璃：四角都圆，右侧一团更重的投影把它和底下
-   的正文分开 */
+/* 浮出的侧栏是一块单独浮起的玻璃卡片：离窗口边 8px、四角圆、一团更重的投影
+   把它和底下的正文分开。窗口本身贴边、没有圆角，只有它浮着。钉住时摘掉
+   data-kg-peek，留边和圆角跟着过渡回 0，贴回窗口左边。 */
+html[data-kg-topbar] body .pI_x6G_sidebarCol {
+  transition: margin var(--ds-transition-duration-slow) var(--ds-ease-in-out),
+    border-radius var(--ds-transition-duration-slow) var(--ds-ease-in-out);
+}
 html[data-kg-topbar][data-kg-peek] body .pI_x6G_frame .pI_x6G_sidebarCol {
   z-index: 3;
-  border-radius: 20px !important;
+  margin: 8px !important;
+  border-radius: var(--kg-r-lg) !important;
   box-shadow:
     inset -1px 0 0 var(--kg-rim),
     inset 1px 1px 0 var(--kg-rim-top),
@@ -1871,6 +1880,7 @@ html body ::-webkit-scrollbar-corner {
   html[data-kg-topbar] body .wSkVaW_headerCorner,
   html[data-kg-topbar] body [data-conversation-tabs],
   html[data-kg-topbar] body .pI_x6G_centerCol,
+  html[data-kg-topbar] body .pI_x6G_sidebarCol,
   html[data-kg-topbar] body .pI_x6G_frame::before {
     transition: none !important;
   }

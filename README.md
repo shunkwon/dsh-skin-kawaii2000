@@ -3,7 +3,8 @@
 [中文版本](./README.zh.md)
 
 A frosted-glass skin for the DeepSeek Harness web UI: a quiet stone-to-mist
-desk, neutral white glass on top of it, and a single graphite accent.
+desk, neutral white glass panes filling the window on top of it, and a single
+graphite accent.
 
 ## Screenshots
 
@@ -14,8 +15,13 @@ Light | Dark
 ## What makes it glass
 
 - **A desk to look through.** The body carries a low-saturation stone-to-mist
-  gradient with a neutral vignette. The whole app floats on it with a 14 px
-  margin, so the glass has an edge to be glass against.
+  gradient with a neutral vignette, and the sidebar, canvas and right panel lie
+  on it edge to edge, letting only a little warmth or coolness through. In 3.0
+  the whole app floated on the desk with a 14 px margin and 20 px corners. From
+  3.1 it is flush with the window (`--kg-window-inset` and `--kg-window-radius`
+  are 0; set them back to 14 px / 20 px for the floating window). Only the
+  sidebar that peeks from the left edge is still a separate rounded card,
+  8 px off the edges.
 - **No hue anywhere but the semantics.** Greys, ink, hairlines and shadows are
   all neutral. Only success, warning and error keep their colours.
 - **One accent.** Graphite (inverted to near-white in dark mode), used solid on
@@ -88,16 +94,18 @@ use CSS anchor positioning and are unaffected.
 With a mouse there is no sidebar toggle button; the sidebar comes out of the
 window's left edge instead:
 
-- **Peek:** rest the pointer on the left edge (the margin around the window)
-  for about 0.12 s and the sidebar slides out as a floating pane of glass over
-  the content, which does not move. A short vertical bar lights up in the
-  margin as the pointer approaches, to show where it comes from.
+- **Peek:** rest the pointer on the window's leftmost 8 px for about 0.12 s and
+  the sidebar slides out as a floating glass card over the content, which does
+  not move. A short vertical bar lights up at the left edge as the pointer
+  approaches, to show where it comes from. Holding a mouse button (say, to
+  select text from the left) never triggers it.
 - **Retract:** move off the sidebar (24 px past its right edge still counts as
   on it) for about 0.3 s and it slides back. It stays out while a menu opened
   from it is showing, while you type in its search box, and while a mouse
   button is held.
-- **Pin:** press ⌥⌘B while it is out. The content moves aside and the sidebar
-  stays, as an expanded sidebar always did; ⌥⌘B again collapses it. The
+- **Pin:** press ⌥⌘B while it is out. The card settles flush against the left
+  edge, the content moves aside and the sidebar stays, as an expanded sidebar
+  always did; ⌥⌘B again collapses it. The
   shortcut is read from the app's own binding, so a remapped one works too.
 - Touch screens have no hover, so they keep the sidebar toggle in the top-left
   corner.
