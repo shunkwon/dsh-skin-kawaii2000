@@ -1160,6 +1160,43 @@ html body [class*="_tableScroll"] td:last-child {
   padding-right: 18px !important;
 }
 
+/* 宽表格（应用给滚动框加 .md-table-wide）是例外，卡片改挂在滚动框上。
+   应用的做法是 margin-left:-lead + padding-left:lead + width:100%+lead+spare，
+   把滚动框一直撑到画布右边缘，表格本身仍是 max-content、每格限宽 320px ——
+   于是挂在 table 上的卡片右半截被画布裁掉，左边和正文对不齐，滚动条比卡片还长。
+   这里把滚动框收回正文栏，表格填满它、长字在格子里换行；列多到每列 4.5em
+   都放不下时才在卡片里横滚。卡片挂在滚动框上，圆角和边框就不会跟着内容滚走。 */
+html body .hWmORq_body .md-table-wide,
+html body .hWmORq_body .md-table-wide:hover,
+html body .hWmORq_body .md-table-wide:focus-visible {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  /* 应用平时 overflow:hidden、悬停才 scroll；皮肤的滚动条是 10px 实体条，
+     悬停时会凭空多出一条空轨，内容跟着往上跳 */
+  padding-bottom: 0 !important;
+  overflow-x: auto !important;
+  background-color: var(--kg-surface-weak) !important;
+  border-radius: var(--kg-r-md) !important;
+  box-shadow:
+    inset 0 0 0 1px var(--kg-rim),
+    inset 0 1px 0 var(--kg-rim-top),
+    var(--kg-shadow-1) !important;
+}
+html body .hWmORq_body .md-table-wide > table {
+  width: 100% !important;
+  max-width: none !important;
+  background-color: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+html body .md-table-wide th,
+html body .md-table-wide td {
+  max-width: none !important;
+  min-width: 4.5em !important;
+}
+
 /* 用户气泡 = 一块中性淡灰实底，右下角收成小圆角（说话的方向） */
 html body [class*="_bubble"] {
   background-color: var(--kg-bubble) !important;
