@@ -612,22 +612,19 @@ html body {
   text-rendering: optimizeLegibility;
 }
 
-/* 夜间桌面：纯黑带一点灰，不带色相。
-   原来三团色斑（暖褐 / 雾蓝 / 青灰）会把透上来的玻璃染成蓝灰，读起来像
-   「深蓝夜景」而不是「黑」。现在底色就是黑，只留三团中性的微亮（纯白低
-   透明，给玻璃一点亮度差和方向感）和一条 #0e0e0e → #000 的线性渐变；
-   灰全部来自玻璃自己那点白，不再从桌面上染色。 */
+/* 夜间桌面：纯黑带一点灰，不带色相，也不带任何纹理。
+   上一版在这里叠了一块 140px 平铺噪点、三团白色微亮和一条线性渐变。问题是
+   这些大面积渐变在 8bit 上只有几个色阶的落差，浏览器只能靠抖动补足 —— 抖出
+   来的就是一层 1px 的细网，放大/缩放后看在眼里就是摩尔纹；平铺噪点本身又是
+   周期图案，两样叠在一起更明显。现在桌面只剩一个纯色：没有渐变就没有抖动，
+   没有平铺就没有周期。层次交给玻璃自己那层白和 1px 亮边。
+   #050505 是「黑，但比 #000 多一点点灰」。 */
 html body[data-ds-dark-theme] {
-  background-color: #000000;
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E"),
-    radial-gradient(58rem 40rem at 4% -10%, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0) 62%),
-    radial-gradient(52rem 40rem at 96% 0%, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0) 60%),
-    radial-gradient(56rem 44rem at 88% 104%, rgba(255, 255, 255, 0.015) 0%, rgba(255, 255, 255, 0) 62%),
-    linear-gradient(158deg, #0e0e0e 0%, #070707 46%, #000000 100%);
-  background-size: 140px 140px, auto, auto, auto, auto;
-  background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat;
-  background-attachment: fixed;
+  background-color: #050505;
+  background-image: none;
+  background-size: auto;
+  background-repeat: repeat;
+  background-attachment: scroll;
   color: var(--kg-ink);
 }
 
@@ -753,6 +750,21 @@ html body .pI_x6G_frame[data-rightbar-fullscreen] [class*="P3OORG_panel"] {
   -webkit-backdrop-filter: blur(34px) saturate(var(--kg-sat));
   backdrop-filter: blur(34px) saturate(var(--kg-sat));
 }
+/* 夜间所有大表面同样只留纯色。
+   侧栏 / 画布 / 右栏 / 底部状态轨 / 页头 / 输入卡片的渐变都只有几个色阶的
+   落差（0.08 → 0.03 → 0 这种），在 8bit 上不够分，只能靠抖动补，抖动就是
+   那层细网。这里统一抹平，玻璃浓度仍由各自的 background-color 决定，区别
+   只靠 1px 亮边、投影和玻璃自己的白 —— 不再靠大面积渐变。 */
+html body[data-ds-dark-theme] .pI_x6G_sidebarCol,
+html body[data-ds-dark-theme] .pI_x6G_centerCol,
+html body[data-ds-dark-theme] .pI_x6G_rightbarCol,
+html body[data-ds-dark-theme] .pI_x6G_bottomRow,
+html body[data-ds-dark-theme] .wSkVaW_header,
+html body[data-ds-dark-theme] [class*="uV2eYG_card"],
+html body[data-ds-dark-theme] .pI_x6G_frame[data-rightbar-fullscreen] [class*="P3OORG_panel"] {
+  background-image: none !important;
+}
+
 html body [class*="P3OORG_panelBody"],
 html body [class*="_tabHost"] {
   background-color: transparent !important;
@@ -1510,10 +1522,11 @@ html body ::-webkit-scrollbar-corner {
   }
   /* 夜间：上面三条带 !important 的白天值会压过夜间桌面和玻璃，正文 --kg-ink
      又是近白，于是白底白字。多一个 [data-ds-dark-theme]（特异度更高）换回暗色：
-     桌面照搬夜间那条线性渐变（同样去掉色斑、同样近黑），面板用夜间
+     桌面用夜间那个纯色（同样没有渐变，免得又抖出细网），面板用夜间
      --kg-tint-solid 的颜色，不透明度与白天两条一一对应。 */
   html body[data-ds-dark-theme] {
-    background-image: linear-gradient(158deg, #0e0e0e 0%, #070707 50%, #000000 100%) !important;
+    background-color: #050505 !important;
+    background-image: none !important;
   }
   html body[data-ds-dark-theme] .pI_x6G_centerCol,
   html body[data-ds-dark-theme] [class*="uV2eYG_card"] {
