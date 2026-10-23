@@ -33,12 +33,41 @@ Light | Dark
 - **Falls back gracefully.** `prefers-reduced-transparency` returns panes to
   solid fills, `prefers-reduced-motion` drops every transition.
 
+## Top bar instead of an icon rail
+
+Laid out like Claude Code: a collapsed sidebar leaves nothing behind on the
+left. Its 56 px icon rail is gone, and the canvas glass fills the whole window.
+
+- The top-left corner holds two ghost buttons: the sidebar toggle and *new
+  session*. They share the conversation header's row, and the session title
+  moves right to make room for them, so the header is the top bar.
+- Everything else from the rail (plugins, automations, workspace tools,
+  balance, settings) lives only in the expanded sidebar.
+- The toggle stays on the same pixel whether the sidebar is open or closed. In
+  the expanded sidebar it replaces the brand row (whale and wordmark), and the
+  graphite *new session* button sits right below it.
+- The secondary header items (agent team, preset, open-in-Finder, ⋯) fade in
+  only while the pointer is in the top bar, focus is inside it or one of their
+  menus is open. On touch screens they stay visible. On narrow windows the
+  agent team / preset pair is dropped so the title keeps its room.
+
+How it works: dsh's layout already has this arrangement for its Windows desktop
+title bar. `lib/topbar.js` sets `data-windows-titlebar` on `<html>`, which
+makes the collapsed column 0 px wide and pins the two buttons. It sets the title
+bar height to `0px` and adds `data-kg-topbar`, and section 6b of `skin.css`
+does the placement. Everything there is keyed on `data-kg-topbar`, so a real
+Windows or macOS desktop build is left alone. It does not use
+`data-platform="darwin"`: the shortcuts package treats that as the Electron
+runtime. If a dsh upgrade brings the rail back, start at
+`dsh-client-ui-layout` (`collapsedWidth`) and the `[data-windows-titlebar]`
+rules in `dsh-client-ui-sidebar`.
+
 ## Hover to open the sidebar
 
 The skin also adds one small behaviour: while the sidebar is collapsed, resting
-the mouse on the whale icon in the top-left corner (about 0.15 s) opens it, no
-click needed. It stays open; close it as before with the collapse button at the
-sidebar's top right or ⌥⌘B. Mouse only, so touch input is unaffected.
+the mouse on the sidebar toggle in the top-left corner (about 0.15 s) opens it,
+no click needed. It stays open; close it as before with the same toggle or
+⌥⌘B. Mouse only, so touch input is unaffected.
 
 ## Install
 

@@ -981,6 +981,164 @@ html body [class*="bhn1Oq_treeBody"] {
 }
 
 /* --------------------------------------------------------------------------
+   6b. 顶栏 — 收起侧栏后不留左边那条图标栏（学 Claude Code）
+   lib/topbar.js 给 html 打上 data-windows-titlebar —— 借 dsh 的 Windows 标题栏
+   模式：收起列宽 56 → 0，开关和新会话固定到左上角，插件 / 自动化 / 工作区 /
+   余额 / 设置收起时隐藏 —— 同时打上 data-kg-topbar。下面只认 data-kg-topbar：
+   真的 Windows 桌面版有自己的标题栏，这一节一条都不生效。
+
+   顶栏不是另起一行，就是会话页头那一行：开关和新会话盖在页头左端，标题让出
+   它们的宽度（--dsh-frame-leading-clearance，页头的标题行本来就读它）。
+
+   定位参照始终是侧栏列（contain: layout）：展开时它 280 宽，收起时 0 宽，
+   左上角都在窗口留边那个点上，所以开关两种状态落在屏幕同一处，展开收起不跳。
+   -------------------------------------------------------------------------- */
+html[data-kg-topbar] body {
+  --kg-topbar-btn: 32px;
+  /* 相对侧栏列左上角的偏移。横向 12px = 侧栏内边距，展开时开关和「新会话」
+     主按钮左缘对齐；纵向 9px 让按钮中心落在页头标题行的中线上
+     （页头上内边距 10px + 标题行 30px，中线在 25px）。 */
+  --kg-topbar-x: 12px;
+  --kg-topbar-y: 9px;
+  --kg-topbar-gap: 4px;
+}
+
+/* Windows 桌面版在所有列上方画的那条标题栏色带：这里没有单独的标题栏 */
+html[data-kg-topbar] body .pI_x6G_frame::before {
+  content: none !important;
+}
+
+html[data-kg-topbar] body .pI_x6G_sidebarCol {
+  contain: layout;
+}
+
+/* 收起：列宽 0，只剩两颗固定定位的按钮。不放开 overflow 它们会被这条 0 宽的
+   列裁掉；z-index 让它们压在画布玻璃上面。收起动画还在走的时候保留侧栏玻璃，
+   读起来是面板缩回去；停下来后连投影一起去掉，否则 0 宽的列还会在画布左缘
+   留一道投影细线。 */
+html[data-kg-topbar] body .pI_x6G_frame[data-sidebar-collapsed] .pI_x6G_sidebarCol {
+  overflow: visible !important;
+  z-index: 2;
+}
+html[data-kg-topbar] body .pI_x6G_frame[data-sidebar-collapsed]:not([data-animating]) .pI_x6G_sidebarCol {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* 全屏面板盖住整扇窗，左上角是它自己的页签条：两颗按钮让它盖住，不浮在页签上。
+   宽度再扣掉展开的侧栏（布局只扣了侧栏宽，没扣两侧生底），免得压到侧栏上。 */
+html[data-kg-topbar] body .pI_x6G_frame[data-rightbar-fullscreen] .pI_x6G_sidebarCol {
+  z-index: auto;
+}
+html[data-kg-topbar] body .pI_x6G_frame[data-rightbar-fullscreen] [data-sidebar-right-panel] {
+  max-width: calc(100vw - 2 * var(--kg-window-inset) - var(--dsh-windows-sidebar-width, 0px)) !important;
+}
+html[data-kg-topbar] body .pI_x6G_frame[data-rightbar-fullscreen]:not([data-sidebar-collapsed]) [data-sidebar-right-panel] {
+  border-radius: 0 20px 20px 0 !important;
+}
+
+/* 收起后画布就是整扇窗：四角都圆；右栏打开时右侧两个角交给右栏 */
+html[data-kg-topbar] body .pI_x6G_frame[data-sidebar-collapsed] .pI_x6G_centerCol {
+  border-radius: 20px !important;
+}
+html[data-kg-topbar] body .pI_x6G_frame[data-sidebar-collapsed]:not([style*="minmax(0px, 0px)"]) .pI_x6G_centerCol {
+  border-radius: 20px 0 0 20px !important;
+}
+
+/* 页头标题给左上角两颗按钮让位：按钮右缘再空 12px */
+html[data-kg-topbar] body .pI_x6G_frame[data-sidebar-collapsed] {
+  --dsh-frame-leading-clearance: calc(var(--kg-topbar-x) + 2 * var(--kg-topbar-btn) + var(--kg-topbar-gap) + 12px);
+}
+
+/* 开关：两种状态都是顶栏最左边那颗按钮。只用面板图标，鲸鱼不再出现 */
+html[data-kg-topbar] body .hHd-Xa_toggle {
+  position: fixed !important;
+  top: var(--kg-topbar-y) !important;
+  left: var(--kg-topbar-x) !important;
+  width: var(--kg-topbar-btn) !important;
+  height: var(--kg-topbar-btn) !important;
+  border-radius: var(--kg-r-xs) !important;
+  color: var(--kg-muted) !important;
+}
+html[data-kg-topbar] body .hHd-Xa_toggle .hHd-Xa_railMark {
+  display: none !important;
+}
+html[data-kg-topbar] body .hHd-Xa_toggle .hHd-Xa_panelIcon {
+  display: inline !important;
+}
+
+/* 新会话：收起时是开关右边一颗只有图标的幽灵按钮。侧栏里那颗石墨主按钮不变，
+   顶栏上不再放第二处强调色。悬停时的 ⌥⌘N 塞不进 32px，交给提示气泡。 */
+html[data-kg-topbar] body .hHd-Xa_collapsed .hHd-Xa_newSession {
+  position: fixed !important;
+  top: var(--kg-topbar-y) !important;
+  left: calc(var(--kg-topbar-x) + var(--kg-topbar-btn) + var(--kg-topbar-gap)) !important;
+  width: var(--kg-topbar-btn) !important;
+  height: var(--kg-topbar-btn) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: var(--kg-r-xs) !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  color: var(--kg-muted) !important;
+}
+/* 悬停只铺一层淡灰，不做白玻璃方块：顶栏按钮是窗口 chrome，不是面板上的卡片 */
+html[data-kg-topbar] body .hHd-Xa_toggle:hover,
+html[data-kg-topbar] body .hHd-Xa_collapsed .hHd-Xa_newSession:hover {
+  background-color: var(--dsw-specific-sidebar-nav-item-active) !important;
+  box-shadow: none !important;
+  color: var(--kg-ink) !important;
+}
+
+/* 开关的提示：展开时朝右，落在品牌行空出来的那一截里；朝下（标题栏模式的
+   默认）会正好盖在「新会话」主按钮上。收起时下方是空的画布，照旧朝下。
+   这里直接按侧栏列的坐标摆，所以不要上面那条留边补偿。 */
+html[data-kg-topbar] body .hHd-Xa_root:not(.hHd-Xa_collapsed) .hHd-Xa_logoRow > [role="tooltip"] {
+  left: calc(var(--kg-topbar-x) + var(--kg-topbar-btn) + 8px) !important;
+  top: calc(var(--kg-topbar-y) + var(--kg-topbar-btn) / 2) !important;
+  transform: translateY(-50%) !important;
+  translate: none;
+}
+html[data-kg-topbar] body .hHd-Xa_collapsed .hHd-Xa_newSessionLabelMask,
+html[data-kg-topbar] body .hHd-Xa_collapsed .hHd-Xa_newSessionLabel {
+  color: inherit !important;
+}
+html[data-kg-topbar] body .hHd-Xa_collapsed .hHd-Xa_newSessionShortcut {
+  display: none !important;
+}
+
+/* 展开：品牌行（鲸鱼 + 字标 + 版本角标）让给开关，这一行只留按钮的高度 */
+html[data-kg-topbar] body .hHd-Xa_root:not(.hHd-Xa_collapsed) .hHd-Xa_brand {
+  display: none !important;
+}
+html[data-kg-topbar] body .hHd-Xa_root:not(.hHd-Xa_collapsed) .hHd-Xa_logoRow {
+  height: 36px !important;
+}
+
+/* 页头里次要的那几样 —— 标题后的「智能体团队」「标准模式」、右侧的「访达
+   打开」「⋯」—— 平时退成透明，指针进到顶栏、键盘聚焦进来、或者它们自己的
+   菜单开着时才显示。最右的右栏开关常驻。触屏没有悬停，一直显示。 */
+@media (hover: hover) {
+  html[data-kg-topbar] body .wSkVaW_headerActions,
+  html[data-kg-topbar] body .wSkVaW_headerUtilities {
+    opacity: 0;
+    transition: opacity var(--kg-t);
+  }
+  html[data-kg-topbar] body .wSkVaW_header:is(:hover, :focus-within) :is(.wSkVaW_headerActions, .wSkVaW_headerUtilities),
+  html[data-kg-topbar] body :is(.wSkVaW_headerActions, .wSkVaW_headerUtilities):has([aria-expanded="true"]) {
+    opacity: 1;
+  }
+}
+/* 窄窗口一行放不下时标题优先：标题后那串次要按钮整个收起（手机宽度上它们会把
+   标题挤成 0 宽）。标题行本身是尺寸容器（container-type: inline-size），按它的
+   内容宽度判断。 */
+@container (max-width: 480px) {
+  html[data-kg-topbar] body .wSkVaW_headerActions {
+    display: none !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
    7. 页签 — 玻璃分段控件
    旧版是 Win2000 页签条。玻璃版没有「压在基线上」这回事：整条是一个
    凹槽，选中项是一块浮起来的白玻璃。
@@ -1237,8 +1395,10 @@ html body .md-table-wide td {
   min-width: 4.5em !important;
 }
 
-/* 用户气泡 = 一块中性淡灰实底，右下角收成小圆角（说话的方向） */
-html body [class*="_bubble"] {
+/* 用户气泡 = 一块中性淡灰实底，右下角收成小圆角（说话的方向）。
+   提示气泡（primitives 的 Tooltip）类名也带 _bubble，不排除的话所有提示都会
+   被刷成这块 12% 的淡灰聊天气泡：底下的按钮整个透上来（2026-10-24 截图）。 */
+html body [class*="_bubble"]:not([role="tooltip"]) {
   background-color: var(--kg-bubble) !important;
   background-image: none !important;
   border-radius: var(--kg-r-md) var(--kg-r-md) 6px var(--kg-r-md) !important;
@@ -1450,6 +1610,13 @@ html body [role="tooltip"] {
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
+/* 侧栏里的提示是 position: fixed，按窗口坐标算的位置；可侧栏列有
+   backdrop-filter，是固定定位的包含块，它的原点在窗口留边那一格上，于是
+   每个提示都往右下偏了一个留边。用 translate 抵回去（transform 留给提示
+   自己的居中）。 */
+html body .pI_x6G_sidebarCol [role="tooltip"] {
+  translate: calc(-1 * var(--kg-window-inset)) calc(-1 * var(--kg-window-inset));
+}
 
 /* 改动文件的悬停对比浮层（改动文件卡上悬停 500ms 出现的 HoverCard preview）。
    这块内容是要逐行读的代码，可它的底色只来自 --dsw-alias-bg-layer-1，玻璃皮肤
@@ -1592,5 +1759,9 @@ html body ::-webkit-scrollbar-corner {
   }
   html body button:active:not(:disabled) {
     transform: none !important;
+  }
+  html[data-kg-topbar] body .wSkVaW_headerActions,
+  html[data-kg-topbar] body .wSkVaW_headerUtilities {
+    transition: none !important;
   }
 }
