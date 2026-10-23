@@ -1035,7 +1035,8 @@ html body [class*="_tableFill"] {
     var(--kg-shadow-1) !important;
   background-color: var(--kg-surface-weak) !important;
   background-image: none !important;
-  overflow: hidden;
+  /* 不写 overflow:hidden —— 这两层里有一层是横向滚动容器，
+     改了宽表就滚不动；滚容器自己会按 border-radius 裁切内容。 */
 }
 html body [class*="_tableScroll"] th:first-child,
 html body [class*="_tableScroll"] td:first-child {
