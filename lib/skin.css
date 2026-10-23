@@ -659,14 +659,21 @@ html body [data-platform="darwin"] .pI_x6G_centerCol {
   backdrop-filter: blur(34px) saturate(1.45) !important;
 }
 
+/* 右栏装的也是内容（文件/终端/面板），所以用画布那块玻璃，不用侧栏的糖色薄玻璃 ——
+   否则同一个窗口里左右两种「玻璃浓度」，看着像两种材质。 */
 html body .pI_x6G_rightbarCol,
 html body [data-platform="darwin"] .pI_x6G_rightbarCol {
-  background-color: var(--kg-tint) !important;
-  background-image: none !important;
+  background-color: var(--kg-tint-canvas) !important;
+  background-image:
+    radial-gradient(120% 90% at 50% 34%, var(--kg-veil-1) 0%, var(--kg-veil-2) 62%, var(--kg-veil-3) 100%),
+    linear-gradient(185deg, var(--kg-veil-top) 0%, rgba(255, 255, 255, 0) 60%) !important;
   border-radius: 0 20px 20px 0 !important;
-  box-shadow: inset 1px 0 0 var(--kg-rim) !important;
-  -webkit-backdrop-filter: blur(var(--kg-blur)) saturate(1.6) !important;
-  backdrop-filter: blur(var(--kg-blur)) saturate(1.6) !important;
+  box-shadow:
+    inset 1px 0 0 var(--kg-rim),
+    inset 0 1px 0 var(--kg-rim),
+    inset -1px -1px 0 var(--kg-rim) !important;
+  -webkit-backdrop-filter: blur(34px) saturate(1.45) !important;
+  backdrop-filter: blur(34px) saturate(1.45) !important;
 }
 
 /* 右栏打开时，画布不再是右边缘 —— 把右侧圆角交还给右栏，
@@ -692,13 +699,21 @@ html body .pI_x6G_bottomRow {
   backdrop-filter: blur(22px) saturate(1.6) !important;
 }
 
-/* 「面板 / 新标签页」是一层 off-canvas 覆盖层（P3OORG_panel），应用把它按
-   整窗尺寸铺在 frame 的 14px 生底之上、还带一层实色底（rgb(251,241,249)），
-   所以这个视图既没有生底边、四角也是直角。把它收进 14px、换成同一块玻璃，
-   里面那层实色底（_tabHost）清掉，这个视图就和其它视图对齐了。 */
+/* 「面板 / 新标签页」是 off-canvas 覆盖层（P3OORG_panel）。
+   它有两种摆法，别一把梭：
+     · 有右栏时：它就在右栏里（已经被列宽对齐了），只需要把右侧圆角接过来、
+       别再拿自己的实色底糊住右栏的玻璃；
+     · 窄窗全屏时（frame 带 data-rightbar-fullscreen）：它按整窗尺寸铺在
+       14px 生底之上，得自己收进 14px、四角都圆。
+   应用给它铺了一层实色底 rgb(251,241,249)，那是它「不像玻璃」的主因。 */
 html body [class*="P3OORG_panel"] {
-  inset: 14px !important;
   border: 0 !important;
+  border-radius: 0 20px 20px 0 !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+html body .pI_x6G_frame[data-rightbar-fullscreen] [class*="P3OORG_panel"] {
+  inset: 14px !important;
   border-radius: 20px !important;
   background-color: var(--kg-tint-canvas) !important;
   background-image:
@@ -717,7 +732,7 @@ html body [class*="_tabHost"] {
   background-color: transparent !important;
   background-image: none !important;
 }
-/* 页签条原本贴着窗口左边（x≈+1），收进 20px 圆角后会被咬掉一截 */
+/* 页签条原本贴着窗口左边（x≈+1），收进圆角后会被咬掉一截 */
 html body [class*="_tabHostHeader"] {
   padding-left: 12px !important;
   padding-right: 12px !important;
