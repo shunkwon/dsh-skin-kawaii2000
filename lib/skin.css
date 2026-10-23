@@ -1403,6 +1403,13 @@ html body [class*="pXSMma_headline"] {
   font-family: var(--kg-font-display);
   letter-spacing: 0;
 }
+/* 首屏的鱼形 logo：去掉。HeroShell 在标题左边留了一个 34px 的品牌位
+   （dsh 官方的鱼形 SVG，悬停会摆尾），这里连命中区一起隐藏；标题和
+   「预览版」角标仍由 .headline 的 justify-content:center 居中。
+   类名用后缀匹配：CSS Module 的哈希前缀（pXSMma_）随 dsh 构建变化。 */
+html body [class*="_fishHitbox"] {
+  display: none !important;
+}
 html body [class*="pXSMma_workspace"]:not([class*="Label"]),
 html body [class*="wSkVaW_heroWorkspaceRow"] > * {
   border-radius: var(--kg-r-sm) !important;
