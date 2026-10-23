@@ -106,3 +106,14 @@ substring 匹配很容易命中嵌套子节点 —— 比如 `[class*="_card"]` 
 
 改完样式后，在浏览器控制台粘 [tools/audit-nesting.js](./tools/audit-nesting.js)
 跑一遍（插件页、设置→内置插件、对话、首屏各跑一次），输出为空才算干净。
+跑的时候让一个提示气泡开着：Tooltip 的类名也带 `_bubble`，曾经被聊天气泡那条
+规则一起刷成透明底，只有气泡在屏幕上时才查得出来。
+
+## 维护提示：玻璃面会把提示气泡带偏
+
+侧栏、画布、右栏都有 `backdrop-filter`，它让元素成为 `position: fixed` 子元素的
+包含块。dsh 的 Tooltip 是 fixed 定位、按窗口坐标摆的，于是会偏出一个面板原点
+（画布在侧栏展开时是 294px，提示直接出了窗口）。[lib/tooltip-fix.js](./lib/tooltip-fix.js)
+在气泡出现或移动时量出包含块原点、用 `translate` 抵回去，并把贴边的气泡收回面板
+以内。给新的面板加玻璃时不用另外处理；要按面板坐标亲手摆某个提示（像展开时开关
+那个），写 `translate: none !important`。菜单用的是 CSS 锚点定位，不受影响。

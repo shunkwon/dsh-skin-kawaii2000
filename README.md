@@ -62,6 +62,18 @@ runtime. If a dsh upgrade brings the rail back, start at
 `dsh-client-ui-layout` (`collapsedWidth`) and the `[data-windows-titlebar]`
 rules in `dsh-client-ui-sidebar`.
 
+## Tooltips inside the glass
+
+The sidebar, canvas and right panel all use `backdrop-filter`, which makes each
+of them the containing block for `position: fixed` children. dsh's tooltips are
+fixed and placed in window coordinates, so without help they shift by the
+pane's origin. In the canvas that is 294 px when the sidebar is open, enough to
+push a tooltip off-screen. `lib/tooltip-fix.js` measures the real origin when a
+tooltip appears or moves, cancels it with `translate`, and pulls tooltips near
+an edge back inside the pane. To place one tooltip by hand in pane coordinates
+(as the expanded sidebar toggle does), use `translate: none !important`. Menus
+use CSS anchor positioning and are unaffected.
+
 ## Hover to open the sidebar
 
 The skin also adds one small behaviour: while the sidebar is collapsed, resting

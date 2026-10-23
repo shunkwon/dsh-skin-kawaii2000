@@ -1,4 +1,4 @@
-// 把 lib/skin.css、lib/sidebar-hover.js 和 lib/topbar.js 打成 dsh 客户端插件 bundle(lib/client.js)。
+// 把 lib/skin.css、lib/sidebar-hover.js、lib/topbar.js 和 lib/tooltip-fix.js 打成 dsh 客户端插件 bundle(lib/client.js)。
 // dsh 的客户端模块系统是「惰性 CJS 表」:执行 bundle 只登记 factory,
 // 所有副作用(含 CSS 注入)发生在 factory 体内、materialize 的时候;
 // 悬浮监听和顶栏模式则挂在 apply(ctx) 的 ctx.effect 里,插件卸载时跟着撤掉。
@@ -21,6 +21,7 @@ const inline = file => readFileSync(join(here, 'lib', file), 'utf8')
   .join('\n')
 const hover = inline('sidebar-hover.js')
 const topbar = inline('topbar.js')
+const tooltipFix = inline('tooltip-fix.js')
 
 const bundle = `window.__ModuleLoader__.load({
 \tid: ${JSON.stringify(ID)},
@@ -46,11 +47,15 @@ ${hover}
 ${topbar}
 \t\tif (typeof document !== "undefined") installTopbar(document);
 \t\t//#endregion
+\t\t//#region lib/tooltip-fix.js
+${tooltipFix}
+\t\t//#endregion
 \t\t//#region lib/client.js
-\t\t/** Client half of the skin plugin: the stylesheet, the top-bar layout, and hover-to-open for the collapsed sidebar. */
+\t\t/** Client half of the skin plugin: the stylesheet, the top-bar layout, tooltips placed back inside the glass panes, and hover-to-open for the collapsed sidebar. */
 \t\tfunction apply(ctx) {
 \t\t\tif (typeof document === "undefined") return;
 \t\t\tctx.effect(() => installTopbar(document), "kawaii2000: top bar");
+\t\t\tctx.effect(() => installTooltipFix(document), "kawaii2000: tooltips inside glass panes");
 \t\t\tctx.effect(() => installSidebarHover(document), "kawaii2000: hover opens sidebar");
 \t\t}
 \t\t//#endregion

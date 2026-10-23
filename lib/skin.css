@@ -1092,12 +1092,12 @@ html[data-kg-topbar] body .hHd-Xa_collapsed .hHd-Xa_newSession:hover {
 
 /* 开关的提示：展开时朝右，落在品牌行空出来的那一截里；朝下（标题栏模式的
    默认）会正好盖在「新会话」主按钮上。收起时下方是空的画布，照旧朝下。
-   这里直接按侧栏列的坐标摆，所以不要上面那条留边补偿。 */
+   这里直接按侧栏列的坐标摆，所以 tooltip-fix.js 写的原点补偿要压掉。 */
 html[data-kg-topbar] body .hHd-Xa_root:not(.hHd-Xa_collapsed) .hHd-Xa_logoRow > [role="tooltip"] {
   left: calc(var(--kg-topbar-x) + var(--kg-topbar-btn) + 8px) !important;
   top: calc(var(--kg-topbar-y) + var(--kg-topbar-btn) / 2) !important;
   transform: translateY(-50%) !important;
-  translate: none;
+  translate: none !important;
 }
 html[data-kg-topbar] body .hHd-Xa_collapsed .hHd-Xa_newSessionLabelMask,
 html[data-kg-topbar] body .hHd-Xa_collapsed .hHd-Xa_newSessionLabel {
@@ -1610,13 +1610,9 @@ html body [role="tooltip"] {
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
-/* 侧栏里的提示是 position: fixed，按窗口坐标算的位置；可侧栏列有
-   backdrop-filter，是固定定位的包含块，它的原点在窗口留边那一格上，于是
-   每个提示都往右下偏了一个留边。用 translate 抵回去（transform 留给提示
-   自己的居中）。 */
-html body .pI_x6G_sidebarCol [role="tooltip"] {
-  translate: calc(-1 * var(--kg-window-inset)) calc(-1 * var(--kg-window-inset));
-}
+/* 侧栏、画布、右栏里的提示（position: fixed、按窗口坐标摆）会被这几块玻璃的
+   backdrop-filter 当成相对面板定位，偏出一个面板原点 —— 由 lib/tooltip-fix.js
+   量出原点、用 translate 抵回去。 */
 
 /* 改动文件的悬停对比浮层（改动文件卡上悬停 500ms 出现的 HoverCard preview）。
    这块内容是要逐行读的代码，可它的底色只来自 --dsw-alias-bg-layer-1，玻璃皮肤
