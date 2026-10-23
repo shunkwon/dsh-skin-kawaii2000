@@ -931,6 +931,11 @@ html body [class*="bhn1Oq_treeBody"] {
    凹槽，选中项是一块浮起来的白玻璃。
    -------------------------------------------------------------------------- */
 html body [role="tablist"] {
+  /* 应用给的是 margin-top:10px，页签正好压在页头那条分隔线上。
+     上面收小到 4px、下面补 6px：页签离标题近一点，离那条线留出呼吸
+     —— 读起来是「线在下面」，而不是「框骑在线上」。 */
+  margin-top: 4px !important;
+  margin-bottom: 6px !important;
   background-color: var(--kg-well) !important;
   background-image: none !important;
   border: 0 !important;
@@ -980,6 +985,30 @@ html body [role="tab"]::after,
 html body [role="tab"]::before {
   display: none !important;
 }
+
+/* 面板的页签条：别做成「凹槽里再套一颗药丸」——
+   外层那颗胶囊和选中页签的圆角挨得太近，读起来是两层框。
+   外层退回透明，只留选中页签那一块玻璃，图标做幽灵键。 */
+html body [class*="_tabStrip"] {
+  background-color: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  gap: 4px !important;
+}
+html body [class*="_stripChrome"] button,
+html body [class*="_iconButton_6nhg2"] {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  color: var(--kg-faint) !important;
+}
+html body [class*="_stripChrome"] button:hover,
+html body [class*="_iconButton_6nhg2"]:hover {
+  background-color: var(--kg-surface) !important;
+  color: var(--kg-ink) !important;
+}
+
 
 /* --------------------------------------------------------------------------
    8. 对话 — 正文、表格、代码、气泡
