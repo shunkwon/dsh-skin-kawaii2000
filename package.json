@@ -1,13 +1,13 @@
 {
   "name": "dsh-skin-kawaii2000",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "private": true,
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/shunkwon/dsh-skin-kawaii2000.git"
   },
-  "description": "dsh 皮肤 糖果毛玻璃 —— 饱和糖果桌面 + 乳白毛玻璃窗(backdrop-filter + 双层亮边 + 有色柔光 + 四档圆角)，白天/夜间两套配方",
+  "description": "dsh 皮肤 雾面玻璃 —— 低饱和石色桌面 + 中性白毛玻璃窗(backdrop-filter + 内侧亮边 + 外侧发丝线 + 中性淡投影 + 四档圆角)，唯一强调色石墨，白天/夜间两套配方",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
