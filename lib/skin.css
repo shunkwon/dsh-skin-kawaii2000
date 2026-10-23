@@ -352,10 +352,10 @@ html body[data-ds-dark-theme] {
   --kg-side-1: rgba(255, 255, 255, 0.06);
   --kg-side-2: rgba(255, 255, 255, 0.02);
   --kg-side-3: rgba(255, 255, 255, 0.03);
-  --kg-card-base: rgba(58, 34, 62, 0.8);
-  --kg-card-1: rgba(255, 255, 255, 0.18);
-  --kg-card-2: rgba(255, 255, 255, 0.1);
-  --kg-card-3: rgba(255, 255, 255, 0.14);
+  --kg-card-base: rgba(74, 46, 80, 0.82);
+  --kg-card-1: rgba(255, 255, 255, 0.24);
+  --kg-card-2: rgba(255, 255, 255, 0.13);
+  --kg-card-3: rgba(255, 255, 255, 0.18);
   --kg-rail-base: rgba(255, 255, 255, 0.06);
   --kg-rail-1: rgba(255, 255, 255, 0.02);
   --kg-rail-2: rgba(255, 255, 255, 0.06);
@@ -1150,6 +1150,21 @@ html body [class*="uV2eYG_root"]:focus-within [class*="uV2eYG_card"] {
     inset 0 0 0 1px rgba(255, 92, 158, 0.42),
     0 22px 48px -24px rgba(216, 27, 112, 0.5),
     0 0 0 4px rgba(255, 92, 158, 0.1) !important;
+}
+
+html body[data-ds-dark-theme] [class*="uV2eYG_card"] {
+  box-shadow:
+    inset 0 1px 0 var(--kg-rim-top),
+    inset 0 0 0 1px var(--kg-rim),
+    0 22px 48px -26px rgba(0, 0, 0, 0.9),
+    0 0 34px -12px rgba(255, 110, 175, 0.35) !important;
+}
+html body[data-ds-dark-theme] [class*="uV2eYG_root"]:focus-within [class*="uV2eYG_card"] {
+  box-shadow:
+    inset 0 1px 0 var(--kg-rim-top),
+    inset 0 0 0 1px rgba(255, 158, 201, 0.5),
+    0 22px 48px -26px rgba(0, 0, 0, 0.9),
+    0 0 40px -10px rgba(255, 110, 175, 0.45) !important;
 }
 
 /* 输入区内部：不要井、不要框，只留字 */
