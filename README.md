@@ -38,10 +38,10 @@ Light | Dark
 Laid out like Claude Code: a collapsed sidebar leaves nothing behind on the
 left. Its 56 px icon rail is gone, and the canvas glass fills the whole window.
 
-- The top-left corner holds one ghost button, *new session* (touch screens also
-  get the sidebar toggle in front of it). It shares the conversation header's
-  row, and the session title moves right to make room, so the header is the
-  top bar.
+- Nothing sits in the top-left corner: the conversation header's row is the top
+  bar and the title starts at its left edge. New sessions come from ⌥⌘N or the
+  sidebar's own button. Touch screens keep a sidebar toggle there, and the
+  title moves right to make room for it.
 - Everything else from the rail (plugins, automations, workspace tools,
   balance, settings) lives only in the expanded sidebar.
 - The expanded sidebar has no brand row (whale and wordmark) any more: the
@@ -53,9 +53,10 @@ left. Its 56 px icon rail is gone, and the canvas glass fills the whole window.
   trajectory view has no shortcut or command and the chosen view is remembered
   per session, so without them a session left on *trajectory* could not get
   back.
-- The secondary header items (agent team, preset, the tabs, open-in-Finder, ⋯)
-  fade in only while the pointer is in the top bar, focus is inside it or one
-  of their menus is open. On touch screens they stay visible. Below 760 px of
+- Everything in the header except the title (agent team, preset, the tabs,
+  open-in-Finder, ⋯, the right-panel toggle) fades in only while the pointer is
+  in the top bar, focus is inside it or one of their menus is open. On touch
+  screens they stay visible. ⇧⌘B also opens the right panel. Below 760 px of
   header width the agent team / preset pair is dropped, and below 520 px the
   tabs return to a line of their own, so the title always keeps its room.
 

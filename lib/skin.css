@@ -987,8 +987,9 @@ html body [class*="bhn1Oq_treeBody"] {
    余额 / 设置收起时隐藏 —— 同时打上 data-kg-topbar。下面只认 data-kg-topbar：
    真的 Windows 桌面版有自己的标题栏，这一节一条都不生效。
 
-   顶栏不是另起一行，就是会话页头那一行：开关和新会话盖在页头左端，标题让出
-   它们的宽度（--dsh-frame-leading-clearance，页头的标题行本来就读它）。
+   顶栏不是另起一行，就是会话页头那一行。左上角不放新会话（⌥⌘N、侧栏里的主按钮
+   都还在），用鼠标时连侧栏开关也没有，标题就从页头自己的内边距开始；触屏上留着
+   开关，标题让出它的宽度（--dsh-frame-leading-clearance，页头的标题行本来就读它）。
 
    定位参照始终是侧栏列（contain: layout）：展开时它 280 宽，收起时 0 宽，
    左上角都在窗口留边那个点上，所以按钮两种状态落在屏幕同一处，展开收起不跳。
@@ -1004,12 +1005,13 @@ html[data-kg-topbar] body {
   --kg-topbar-x: 12px;
   --kg-topbar-y: 9px;
   --kg-topbar-gap: 4px;
-  /* 开关占掉的那一截；用鼠标时开关藏起来，这一截归零，新会话挪到最左 */
-  --kg-topbar-toggle-space: calc(var(--kg-topbar-btn) + var(--kg-topbar-gap));
+  /* 左上角按钮占掉的那一截（含右边留给标题的 12px）：触屏上只有开关一颗；
+     用鼠标时开关也藏起来，这一截归零 */
+  --kg-topbar-lead: calc(var(--kg-topbar-x) + var(--kg-topbar-btn) + 12px);
 }
 @media (hover: hover) and (pointer: fine) {
   html[data-kg-topbar] body {
-    --kg-topbar-toggle-space: 0px;
+    --kg-topbar-lead: 0px;
   }
   html[data-kg-topbar] body .hHd-Xa_toggle {
     display: none !important;
@@ -1051,7 +1053,7 @@ html[data-kg-topbar] body .pI_x6G_sidebarCol {
   contain: layout;
 }
 
-/* 收起：列宽 0，只剩固定定位的按钮（新会话；触屏上还有开关）。不放开 overflow 它们会被这条 0 宽的
+/* 收起：列宽 0，只剩固定定位的开关（只在触屏上显示）。不放开 overflow 它会被这条 0 宽的
    列裁掉；z-index 让它们压在画布玻璃上面。收起动画还在走的时候保留侧栏玻璃，
    读起来是面板缩回去；停下来后连投影一起去掉，否则 0 宽的列还会在画布左缘
    留一道投影细线。 */
@@ -1084,11 +1086,11 @@ html[data-kg-topbar] body .pI_x6G_frame[data-sidebar-collapsed]:not([style*="min
   border-radius: 20px 0 0 20px !important;
 }
 
-/* 页头标题给左上角的按钮让位：按钮右缘再空 12px。侧栏浮出时正文不动，
+/* 页头标题给左上角的按钮让位（没有按钮时是 0）。侧栏浮出时正文不动，
    标题也不能跟着侧栏展开挪回去 */
 html[data-kg-topbar] body .pI_x6G_frame[data-sidebar-collapsed],
 html[data-kg-topbar][data-kg-peek] body .pI_x6G_frame {
-  --dsh-frame-leading-clearance: calc(var(--kg-topbar-x) + var(--kg-topbar-toggle-space) + var(--kg-topbar-btn) + 12px);
+  --dsh-frame-leading-clearance: var(--kg-topbar-lead);
 }
 
 /* 浮出：应用已经把侧栏展开成 280 宽的一列，画布用等宽的负 margin 盖回去，
@@ -1137,24 +1139,13 @@ html[data-kg-topbar] body .hHd-Xa_toggle .hHd-Xa_panelIcon {
   display: inline !important;
 }
 
-/* 新会话：收起时是开关右边一颗只有图标的幽灵按钮。侧栏里那颗石墨主按钮不变，
-   顶栏上不再放第二处强调色。悬停时的 ⌥⌘N 塞不进 32px，交给提示气泡。 */
+/* 新会话：收起时标题栏模式会把它固定在左上角，这里整个不要 —— ⌥⌘N 和侧栏里
+   那颗石墨主按钮都还在 */
 html[data-kg-topbar] body .hHd-Xa_collapsed .hHd-Xa_newSession {
-  position: fixed !important;
-  top: var(--kg-topbar-y) !important;
-  left: calc(var(--kg-topbar-x) + var(--kg-topbar-toggle-space)) !important;
-  width: var(--kg-topbar-btn) !important;
-  height: var(--kg-topbar-btn) !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border-radius: var(--kg-r-xs) !important;
-  background-color: transparent !important;
-  box-shadow: none !important;
-  color: var(--kg-muted) !important;
+  display: none !important;
 }
 /* 悬停只铺一层淡灰，不做白玻璃方块：顶栏按钮是窗口 chrome，不是面板上的卡片 */
-html[data-kg-topbar] body .hHd-Xa_toggle:hover,
-html[data-kg-topbar] body .hHd-Xa_collapsed .hHd-Xa_newSession:hover {
+html[data-kg-topbar] body .hHd-Xa_toggle:hover {
   background-color: var(--dsw-specific-sidebar-nav-item-active) !important;
   box-shadow: none !important;
   color: var(--kg-ink) !important;
@@ -1168,13 +1159,6 @@ html[data-kg-topbar] body .hHd-Xa_root:not(.hHd-Xa_collapsed) .hHd-Xa_logoRow > 
   top: calc(var(--kg-topbar-y) + var(--kg-topbar-btn) / 2) !important;
   transform: translateY(-50%) !important;
   translate: none !important;
-}
-html[data-kg-topbar] body .hHd-Xa_collapsed .hHd-Xa_newSessionLabelMask,
-html[data-kg-topbar] body .hHd-Xa_collapsed .hHd-Xa_newSessionLabel {
-  color: inherit !important;
-}
-html[data-kg-topbar] body .hHd-Xa_collapsed .hHd-Xa_newSessionShortcut {
-  display: none !important;
 }
 
 /* 展开：品牌行（鲸鱼 + 字标 + 版本角标）让给开关，这一行只留按钮的高度 */
@@ -1246,18 +1230,20 @@ html[data-kg-topbar] body .wSkVaW_header:has([data-conversation-tabs]) {
   }
 }
 
-/* 页头里次要的那几样 —— 标题后的「智能体团队」「标准模式」、「对话 / 轨迹」
-   页签、右侧的「访达打开」「⋯」—— 平时退成透明，指针进到顶栏、键盘聚焦进来、
-   或者它们自己的菜单开着时才显示。最右的右栏开关常驻。触屏没有悬停，一直显示。 */
+/* 页头里除标题以外的东西 —— 标题后的「智能体团队」「标准模式」、「对话 / 轨迹」
+   页签、右侧的「访达打开」「⋯」和最右的右栏开关 —— 平时退成透明，指针进到顶栏、
+   键盘聚焦进来、或者它们自己的菜单开着时才显示。右栏还能用 ⇧⌘B 开。触屏没有
+   悬停，一直显示。 */
 @media (hover: hover) {
   html[data-kg-topbar] body .wSkVaW_headerActions,
   html[data-kg-topbar] body .wSkVaW_headerUtilities,
+  html[data-kg-topbar] body .wSkVaW_headerCorner,
   html[data-kg-topbar] body [data-conversation-tabs] {
     opacity: 0;
     transition: opacity var(--kg-t);
   }
-  html[data-kg-topbar] body .wSkVaW_header:is(:hover, :focus-within) :is(.wSkVaW_headerActions, .wSkVaW_headerUtilities, [data-conversation-tabs]),
-  html[data-kg-topbar] body :is(.wSkVaW_headerActions, .wSkVaW_headerUtilities):has([aria-expanded="true"]) {
+  html[data-kg-topbar] body .wSkVaW_header:is(:hover, :focus-within) :is(.wSkVaW_headerActions, .wSkVaW_headerUtilities, .wSkVaW_headerCorner, [data-conversation-tabs]),
+  html[data-kg-topbar] body :is(.wSkVaW_headerActions, .wSkVaW_headerUtilities, .wSkVaW_headerCorner):has([aria-expanded="true"]) {
     opacity: 1;
   }
 }
@@ -1882,6 +1868,7 @@ html body ::-webkit-scrollbar-corner {
   }
   html[data-kg-topbar] body .wSkVaW_headerActions,
   html[data-kg-topbar] body .wSkVaW_headerUtilities,
+  html[data-kg-topbar] body .wSkVaW_headerCorner,
   html[data-kg-topbar] body [data-conversation-tabs],
   html[data-kg-topbar] body .pI_x6G_centerCol,
   html[data-kg-topbar] body .pI_x6G_frame::before {
