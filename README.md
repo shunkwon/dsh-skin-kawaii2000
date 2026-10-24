@@ -100,22 +100,46 @@ window's left edge instead:
   approaches, to show where it comes from. Holding a mouse button (say, to
   select text from the left) never triggers it.
 - **Retract:** move off the sidebar (24 px past its right edge still counts as
-  on it) for about 0.3 s and it slides back. It stays out while a menu opened
-  from it is showing, while you type in its search box, and while a mouse
-  button is held.
-- **Pin:** press ⌥⌘B while it is out. The card settles flush against the left
-  edge, the content moves aside and the sidebar stays, as an expanded sidebar
-  always did; ⌥⌘B again collapses it. The
-  shortcut is read from the app's own binding, so a remapped one works too.
+  on it) for about 0.3 s and it slides back. Move back over it while it is
+  sliding away and it comes back. It stays out while a menu opened from it is
+  showing, while you type in its search box, and while a mouse button is held.
+- **Pin:** press ⌥⌘B while it is out. The card docks against the left edge, the
+  content moves aside and the sidebar stays, as an expanded sidebar always did.
+  ⌥⌘B again slides it away and the content fills the window. The shortcut is
+  read from the app's own binding, so a remapped one works too.
 - Touch screens have no hover, so they keep the sidebar toggle in the top-left
   corner.
 
-It lives in `lib/sidebar-peek.js`. A peek clicks the hidden toggle for you and
-sets `data-kg-peek` on `<html>`. `skin.css` then gives the canvas a negative
-margin as wide as the sidebar column, so the canvas covers that column again.
-The margin and the column width run on the same transition, so the content
-stays put as the sidebar slides in and out. `data-kg-peek` comes off only once
-the collapse animation has finished.
+Only the sidebar itself moves. The content never animates: it either stays
+put, or moves aside or fills the window once, after the sidebar has stopped.
+A peek and its retract never re-lay out the content at all.
+
+It lives in `lib/sidebar-peek.js`, which keeps its state in `<html
+data-kg-side>` as space-separated words: `overlay` (the canvas spans the
+sidebar column too, so its box doesn't change), `card` (the floating card look),
+and `hidden` / `leaving` (the sidebar placed / sliding off the window's left
+edge). `skin.css` keys on those words, and the only animated property is the
+sidebar's `transform`. The layout's own column-width transition is turned off,
+so the column snaps open and shut. To switch the sidebar it presses the app's
+own shortcut, which renders about half as much as clicking the toggle, and
+clicks the toggle only if that doesn't work.
+
+Why: in a long conversation (7,000+ nodes) one change of the canvas width
+costs WebKit, the engine DeepSeek.app runs on, 60–90 ms of layout and paint.
+The old version animated the column width and a matching negative margin on
+the canvas, so it paid that on every frame and dropped six or seven frames per
+peek. Now it is paid once, while the sidebar is still, and the slides
+themselves drop no frames.
+
+**Maintenance note:** expanding or collapsing the sidebar changes a few
+inherited CSS variables: the layout sets `--dsh-windows-sidebar-width` on the
+frame, and ui-sidebar sets `--dsh-windows-menu-start` on the root. When an
+inherited variable changes on an ancestor, WebKit restyles every node beneath
+it, 34 ms or more per change in a long conversation. `skin.css` pins the first
+to a constant on the canvas and sidebar columns, pins the second outright, and
+gives `--dsh-frame-leading-clearance` the same value in every state. If you
+add a variable that follows the sidebar state, don't set it on the frame or
+the root.
 
 ## Install
 

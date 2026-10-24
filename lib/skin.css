@@ -997,7 +997,7 @@ html body [class*="bhn1Oq_treeBody"] {
    左上角都在窗口左上角（再加上留边，现在是 0），所以按钮两种状态落在屏幕
    同一处，展开收起不跳。
 
-   用鼠标时没有侧栏开关：碰窗口左边缘，侧栏浮出盖在正文上（data-kg-peek，
+   用鼠标时没有侧栏开关：碰窗口左边缘，侧栏浮出盖在正文上（data-kg-side，
    lib/sidebar-peek.js），⌥⌘B 钉住 / 收起。触屏没有悬停，开关照常显示。
    -------------------------------------------------------------------------- */
 html[data-kg-topbar] body {
@@ -1057,14 +1057,11 @@ html[data-kg-topbar] body .pI_x6G_sidebarCol {
 }
 
 /* 收起：列宽 0，只剩固定定位的开关（只在触屏上显示）。不放开 overflow 它会被这条 0 宽的
-   列裁掉；z-index 让它们压在画布玻璃上面。收起动画还在走的时候保留侧栏玻璃，
-   读起来是面板缩回去；停下来后连投影一起去掉，否则 0 宽的列还会在画布左缘
-   留一道投影细线。 */
+   列裁掉；z-index 让它压在画布玻璃上面。收起是一步到位的（见下面「侧栏只动 transform」），
+   玻璃和投影直接去掉，否则 0 宽的列还会在画布左缘留一道投影细线。 */
 html[data-kg-topbar] body .pI_x6G_frame[data-sidebar-collapsed] .pI_x6G_sidebarCol {
   overflow: visible !important;
   z-index: 2;
-}
-html[data-kg-topbar] body .pI_x6G_frame[data-sidebar-collapsed]:not([data-animating]) .pI_x6G_sidebarCol {
   background: none !important;
   box-shadow: none !important;
 }
@@ -1081,47 +1078,73 @@ html[data-kg-topbar] body .pI_x6G_frame[data-rightbar-fullscreen]:not([data-side
   border-radius: 0 var(--kg-window-radius) var(--kg-window-radius) 0 !important;
 }
 
-/* 收起后画布就是整扇窗：四角都圆；右栏打开时右侧两个角交给右栏 */
-html[data-kg-topbar] body .pI_x6G_frame[data-sidebar-collapsed] .pI_x6G_centerCol {
+/* 收起后（或侧栏盖在正文上时）画布就是整扇窗：四角都圆；右栏打开时右侧两个角交给右栏 */
+html[data-kg-topbar] body .pI_x6G_frame[data-sidebar-collapsed] .pI_x6G_centerCol,
+html[data-kg-topbar][data-kg-side~="overlay"] body .pI_x6G_centerCol {
   border-radius: var(--kg-window-radius) !important;
 }
-html[data-kg-topbar] body .pI_x6G_frame[data-sidebar-collapsed]:not([style*="minmax(0px, 0px)"]) .pI_x6G_centerCol {
+html[data-kg-topbar] body .pI_x6G_frame[data-sidebar-collapsed]:not([style*="minmax(0px, 0px)"]) .pI_x6G_centerCol,
+html[data-kg-topbar][data-kg-side~="overlay"] body .pI_x6G_frame:not([style*="minmax(0px, 0px)"]) .pI_x6G_centerCol {
   border-radius: var(--kg-window-radius) 0 0 var(--kg-window-radius) !important;
 }
 
-/* 页头标题给左上角的按钮让位（没有按钮时是 0）。侧栏浮出时正文不动，
-   标题也不能跟着侧栏展开挪回去 */
+/* 页头标题给左上角的按钮让位（没有按钮时是 0）。侧栏盖在正文上时正文不动，标题也不能
+   跟着侧栏展开挪回去。钉住时也写一个值：这个变量会继承（见下一段），用鼠标时三种状态
+   都是 0，就一直不变。 */
+html[data-kg-topbar] body .pI_x6G_frame {
+  --dsh-frame-leading-clearance: 0px;
+}
 html[data-kg-topbar] body .pI_x6G_frame[data-sidebar-collapsed],
-html[data-kg-topbar][data-kg-peek] body .pI_x6G_frame {
+html[data-kg-topbar][data-kg-side~="overlay"] body .pI_x6G_frame {
   --dsh-frame-leading-clearance: var(--kg-topbar-lead);
 }
 
-/* 浮出：应用已经把侧栏展开成 280 宽的一列，画布用等宽的负 margin 盖回去，
-   盒子和收起时一模一样，正文不重排。margin 跟列宽走同一条过渡（布局的
-   data-animating 用的就是这两个变量），滑出、收回时正文纹丝不动；钉住时摘掉
-   data-kg-peek，margin 过渡回 0，正文这才让开。 */
-html[data-kg-topbar] body .pI_x6G_centerCol {
-  transition: margin-left var(--ds-transition-duration-slow) var(--ds-ease-in-out);
+/* 侧栏只动 transform（lib/sidebar-peek.js，状态在 html 的 data-kg-side 上）。
+   正文不跟着动画：要么原地不动，要么等侧栏停下来才一次让开或铺满。画布宽度变一次，
+   长对话在 WebKit 里要重排 + 重画 60~90ms，放在动画里每一帧都掉，放在动画外面只是一下。
+
+   侧栏一展开、收起，布局就改几个会继承的变量。WebKit 里祖先上的继承变量一变，底下
+   每个节点都要重算样式，长对话七千多个节点，每次 34ms 起：
+   - --dsh-windows-sidebar-width：布局写在 frame 上，只有右栏的全屏面板读它。在画布
+     和侧栏两列上钉成常量，变化就停在这两列，不往整段对话里传；右栏照常继承。
+   - --dsh-windows-menu-start：ui-sidebar 靠 html:has([data-sidebar-collapsed]) 写在
+     根上，只给桌面版的原生菜单用，浏览器里没人读。钉死。
+   - --dsh-frame-leading-clearance：见上一段。 */
+html[data-kg-topbar] {
+  --dsh-windows-menu-start: 84px !important;
 }
-html[data-kg-topbar] body .pI_x6G_frame[data-dragging] .pI_x6G_centerCol {
-  transition: none;
-}
-html[data-kg-topbar][data-kg-peek] body .pI_x6G_frame .pI_x6G_centerCol {
-  margin-left: calc(-1 * var(--dsh-windows-sidebar-width, 0px));
-  border-radius: var(--kg-window-radius) !important;
-}
-html[data-kg-topbar][data-kg-peek] body .pI_x6G_frame:not([style*="minmax(0px, 0px)"]) .pI_x6G_centerCol {
-  border-radius: var(--kg-window-radius) 0 0 var(--kg-window-radius) !important;
-}
-/* 浮出的侧栏是一块单独浮起的玻璃卡片：离窗口边 8px、四角圆、一团更重的投影
-   把它和底下的正文分开。窗口本身贴边、没有圆角，只有它浮着。钉住时摘掉
-   data-kg-peek，留边和圆角跟着过渡回 0，贴回窗口左边。 */
+html[data-kg-topbar] body .pI_x6G_centerCol,
 html[data-kg-topbar] body .pI_x6G_sidebarCol {
-  transition: margin var(--ds-transition-duration-slow) var(--ds-ease-in-out),
-    border-radius var(--ds-transition-duration-slow) var(--ds-ease-in-out);
+  --dsh-windows-sidebar-width: 0px;
 }
-html[data-kg-topbar][data-kg-peek] body .pI_x6G_frame .pI_x6G_sidebarCol {
+
+/* 布局自己的列宽过渡关掉：列宽每变一帧，画布就要重排一次。展开、收起时列宽一步到位。 */
+html[data-kg-topbar] body .pI_x6G_frame[data-animating],
+html[data-kg-topbar] body .pI_x6G_frame[data-animating] .pI_x6G_handle {
+  transition: none !important;
+}
+
+/* overlay：画布横跨侧栏那一列和自己那一列，盒子宽度不随侧栏变，正文不重排；侧栏压在
+   它上面。三列都得显式摆，否则自动排布会把右栏挤到下一行。 */
+html[data-kg-topbar][data-kg-side~="overlay"] body .pI_x6G_sidebarCol {
+  grid-column: 1 / 2 !important;
+  grid-row: 1 !important;
   z-index: 3;
+}
+html[data-kg-topbar][data-kg-side~="overlay"] body .pI_x6G_centerCol {
+  grid-column: 1 / 3 !important;
+  grid-row: 1 !important;
+}
+html[data-kg-topbar][data-kg-side~="overlay"] body .pI_x6G_rightbarCol {
+  grid-column: 3 / 4 !important;
+  grid-row: 1 !important;
+}
+
+/* card：边缘浮出的侧栏是一块单独浮起的玻璃卡片，离窗口边 8px、四角圆、一团更重的投影
+   把它和底下的正文分开。窗口本身贴边、没有圆角，只有它浮着。宽度跟着侧栏内容
+   （justify-self: start），留边往列外伸，不挤内容。 */
+html[data-kg-topbar][data-kg-side~="card"] body .pI_x6G_sidebarCol {
+  justify-self: start;
   margin: 8px !important;
   border-radius: var(--kg-r-lg) !important;
   box-shadow:
@@ -1129,6 +1152,25 @@ html[data-kg-topbar][data-kg-peek] body .pI_x6G_frame .pI_x6G_sidebarCol {
     inset 1px 1px 0 var(--kg-rim-top),
     0 0 0 0.5px var(--kg-outline),
     var(--kg-shadow-3) !important;
+}
+
+/* 动的只有 transform。hidden 不带过渡（摆好起点），摘掉它就滑进来（先快后慢）；leaving
+   带一条更快、先慢后快的过渡滑走。挪出去的距离连投影一起算上。 */
+html[data-kg-topbar] body .pI_x6G_sidebarCol {
+  transition: transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+html[data-kg-topbar][data-kg-side~="hidden"] body .pI_x6G_sidebarCol,
+html[data-kg-topbar][data-kg-side~="leaving"] body .pI_x6G_sidebarCol {
+  transform: translateX(calc(-100% - 56px));
+}
+/* 收起后摘掉 hidden 也不带过渡：不然触屏上那颗开关会从窗口外再滑回来 */
+html[data-kg-topbar][data-kg-side~="hidden"] body .pI_x6G_sidebarCol,
+html[data-kg-topbar] body .pI_x6G_frame[data-sidebar-collapsed] .pI_x6G_sidebarCol {
+  transition: none;
+}
+html[data-kg-topbar][data-kg-side~="leaving"] body .pI_x6G_sidebarCol {
+  transition-duration: 200ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
 }
 
 /* 开关：两种状态都是顶栏最左边那颗按钮。只用面板图标，鲸鱼不再出现 */
@@ -1879,7 +1921,6 @@ html body ::-webkit-scrollbar-corner {
   html[data-kg-topbar] body .wSkVaW_headerUtilities,
   html[data-kg-topbar] body .wSkVaW_headerCorner,
   html[data-kg-topbar] body [data-conversation-tabs],
-  html[data-kg-topbar] body .pI_x6G_centerCol,
   html[data-kg-topbar] body .pI_x6G_sidebarCol,
   html[data-kg-topbar] body .pI_x6G_frame::before {
     transition: none !important;
