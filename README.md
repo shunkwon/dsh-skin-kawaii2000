@@ -137,9 +137,56 @@ frame, and ui-sidebar sets `--dsh-windows-menu-start` on the root. When an
 inherited variable changes on an ancestor, WebKit restyles every node beneath
 it, 34 ms or more per change in a long conversation. `skin.css` pins the first
 to a constant on the canvas and sidebar columns, pins the second outright, and
-gives `--dsh-frame-leading-clearance` the same value in every state. If you
-add a variable that follows the sidebar state, don't set it on the frame or
-the root.
+gives `--dsh-frame-leading-clearance` the same value in every state (in
+DeepSeek.app, where the title has to clear the traffic lights, the offset is set
+on the header alone). If you add a variable that follows the sidebar state,
+don't set it on the frame or the root.
+
+## In DeepSeek.app: the top bar is the titlebar
+
+DeepSeek.app (the WKWebView wrapper in the Dock, source in
+`~/Library/Application Support/DeepSeekWebApp`) has no titlebar row of its own.
+As in Claude Code, the traffic lights sit at the left end of the page's top
+bar, and empty space in that row drags the window:
+
+- **Collapsed:** the session title starts right after the traffic lights and
+  its row is centred on them.
+- **Sidebar out (pinned or peeking):** the sidebar keeps that row free for the
+  traffic lights, and 新会话 sits just below it.
+- Double-clicking empty space in the row does what System Settings › Desktop &
+  Dock says (minimize, zoom, or nothing).
+- In full screen the traffic lights hide, and the layout goes back to the
+  browser one.
+
+The app and the skin meet through a small contract on `<html>`, which the app
+sets from a document-start script:
+
+- `data-native-titlebar`: the traffic lights are showing (removed in full
+  screen).
+- `--native-titlebar-height`: the row's height, twice the traffic lights'
+  centre line (52px on macOS 26).
+- `--native-controls-end`: the right edge of the zoom button (79px).
+
+WebKit has no `app-region`, so the app does the dragging. The page only
+reports whether the pointer is over empty space in that row: nothing clickable
+under it, and no menu or dialog open. The app then takes a plain press there
+as a window drag before the page ever sees it.
+
+With that attribute set, `skin.css` (end of section 6b) does the following:
+
+- Makes the conversation header exactly that row.
+- Moves the title past the traffic lights while the sidebar is collapsed or
+  peeking.
+- Starts the sidebar's content below the row.
+- Pushes the plugin and automation page titles below it, as dsh's own macOS
+  build does.
+- Keeps dialogs clear of it.
+- Moves the full-screen right panel's tab strip past the traffic lights.
+
+`lib/sidebar-peek.js` ignores the left edge inside that row, so reaching for
+the close button doesn't pull the sidebar out. Browsers never get the
+attribute, so none of this applies there. Without this skin the traffic lights
+would cover the session title.
 
 ## Install
 

@@ -1299,6 +1299,69 @@ html[data-kg-topbar] body .wSkVaW_header:has([data-conversation-tabs]) {
   }
 }
 
+/* 在 DeepSeek.app 里：顶栏就是窗口标题栏（学 Claude Code）。
+   app（~/Library/Application Support/DeepSeekWebApp/main.swift）把标题栏做成透明、内容铺满，
+   红绿灯直接落在页面最上面那一行，并在 <html> 上留下约定：
+   - data-native-titlebar：红绿灯正显示着。全屏时拿掉，这一段全部失效，退回上面的样子；
+   - --native-titlebar-height：标题栏那一行的高，红绿灯中线的两倍（macOS 26 是 52px）；
+   - --native-controls-end：红绿灯右缘（79px）。
+   这一行里不是按钮的地方，按下去由 app 拖动窗口、双击按系统设置最小化或缩放，页面不用管。
+   浏览器里没有这个属性，这一段一条都不生效。
+
+   这一行是整扇窗共用的：收起时页头标题接在红绿灯后面，中线对齐红绿灯；侧栏（钉住、
+   浮出的卡片都一样）顶上空出这一行给红绿灯，「新会话」排在它下面 —— 卡片离窗口顶 8px，
+   38px 高的按钮放不进红绿灯那一行。其余会摆到左上角的东西（插件 / 自动化页的大标题、
+   账号页的页头、弹窗、全屏右栏的页签条）都让开红绿灯。 */
+html[data-kg-topbar][data-native-titlebar] body {
+  --kg-native-lead: calc(var(--native-controls-end) + 16px);
+}
+/* 页头整行就是标题栏那一行：高度相同，内容中线对齐红绿灯（行内容 28px 高，扣掉 0.5px 底线） */
+html[data-kg-topbar][data-native-titlebar] body .wSkVaW_header:has([data-conversation-tabs]) {
+  padding-top: calc(var(--native-titlebar-height) / 2 - 14px) !important;
+  padding-bottom: calc(var(--native-titlebar-height) / 2 - 14.5px) !important;
+}
+html[data-kg-topbar][data-native-titlebar] body .wSkVaW_header:not(:has([data-conversation-tabs])):not(.wSkVaW_headerSessionless) {
+  padding-top: calc(var(--native-titlebar-height) / 2 - 15px) !important;
+}
+/* 收起、或者卡片盖在正文上时，标题让到红绿灯后面。只写在页头上，不写在 frame 上：这个变量
+   会继承，写在 frame 上钉住、收起时整段对话都要重算样式（见下面「侧栏只动 transform」） */
+html[data-kg-topbar][data-native-titlebar] body .pI_x6G_frame[data-sidebar-collapsed] .wSkVaW_header,
+html[data-kg-topbar][data-native-titlebar][data-kg-side~="overlay"] body .wSkVaW_header {
+  --dsh-frame-leading-clearance: var(--kg-native-lead);
+}
+/* 侧栏顶上空出标题栏那一行。卡片本身离窗口顶 8px，内边距少 8px，两种状态内容落在同一高度，
+   钉住那一下不跳 */
+html[data-kg-topbar][data-native-titlebar] body .hHd-Xa_root:not(.hHd-Xa_collapsed) {
+  padding-top: var(--native-titlebar-height) !important;
+}
+html[data-kg-topbar][data-native-titlebar][data-kg-side~="card"] body .hHd-Xa_root:not(.hHd-Xa_collapsed) {
+  padding-top: calc(var(--native-titlebar-height) - 8px) !important;
+}
+/* 插件 / 插件详情 / 自动化任务页的大标题：窄窗口里会退到左上角，整个挪到标题栏那一行下面，
+   和 dsh 官方 mac 版（data-platform="darwin"）的做法一样 */
+html[data-kg-topbar][data-native-titlebar] body .X_2TxG_pageHead,
+html[data-kg-topbar][data-native-titlebar] body .X_2TxG_detailTop,
+html[data-kg-topbar][data-native-titlebar] body .X_2TxG_moreHead,
+html[data-kg-topbar][data-native-titlebar] body .t-XoWW_pageHeading {
+  padding-top: calc(28px + var(--native-titlebar-height)) !important;
+}
+/* 账号页铺满整扇窗，它的页头就当标题栏那一行：同高，内容让到红绿灯后面 */
+html[data-kg-topbar][data-native-titlebar] body ._44HXVa_header {
+  height: var(--native-titlebar-height) !important;
+  padding-left: var(--kg-native-lead) !important;
+}
+/* 弹窗离窗口顶至少这么多（设置弹窗、自动化的下拉都读它），碰不到红绿灯 */
+html[data-kg-topbar][data-native-titlebar] {
+  --dsh-frame-overlay-top: calc(var(--native-titlebar-height) + 20px);
+}
+/* 全屏右栏盖住整扇窗时，左上角是它的页签条：让到红绿灯后面，中线对齐（页签条 34px 高，
+   在页头里离顶 4px；页头比面板缩进 1px） */
+html[data-kg-topbar][data-native-titlebar] body .pI_x6G_frame[data-sidebar-collapsed] [data-sidebar-right-panel="fullscreen"] [class*="_tabHostHeader_"],
+html[data-kg-topbar][data-native-titlebar][data-kg-side~="overlay"] body [data-sidebar-right-panel="fullscreen"] [class*="_tabHostHeader_"] {
+  padding-top: calc(var(--native-titlebar-height) / 2 - 21px) !important;
+  padding-left: calc(var(--kg-native-lead) - 1px) !important;
+}
+
 /* --------------------------------------------------------------------------
    7. 页签 — 玻璃分段控件
    旧版是 Win2000 页签条。玻璃版没有「压在基线上」这回事：整条是一个
