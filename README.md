@@ -157,8 +157,10 @@ opens the session and stays at the bottom, so the skin adds the rest.
 - If the app pulls the view back to the bottom within 3 s of the jump, it
   scrolls back. Once you scroll, click or press a key yourself, it lets go.
 - Switching to another session clears the marks.
-- Text inside collapsed tool calls or reasoning isn't on the page; then the
-  session just opens without a jump.
+- If the keyword is inside a turn's folded steps (under "Done in …"), that fold
+  is expanded first, the way the browser's own find-in-page does it. Content
+  that is never rendered (such as tool output nobody opened) can't be found;
+  then the session just opens without a jump.
 
 The code is `lib/search-jump.js`. Marks use the CSS Custom Highlight API
 (`CSS.highlights`, no DOM changes), coloured by `--kg-find` /
