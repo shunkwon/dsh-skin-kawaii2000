@@ -1869,6 +1869,83 @@ html body [role="tooltip"] {
    backdrop-filter 当成相对面板定位，偏出一个面板原点 —— 由 lib/tooltip-fix.js
    量出原点、用 translate 抵回去。 */
 
+/* 搜索命中条（lib/search-jump.js）：点搜索结果进来后浮在对话区右上角，
+   「关键词 2 / 5 ↑ ↓ ×」。挂在 body 上、按窗口坐标摆（top / right 由脚本按滚动区写），
+   不在任何玻璃面里，所以不受 backdrop-filter 改包含块的影响。配方同菜单。 */
+html body .kg-findbar {
+  position: fixed;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 32px;
+  padding: 0 4px 0 12px;
+  border-radius: var(--kg-r-sm);
+  corner-shape: superellipse(1.6);
+  background-color: var(--kg-tint-solid);
+  box-shadow:
+    inset 0 1px 0 var(--kg-rim-top),
+    inset 0 0 0 1px var(--kg-rim),
+    var(--kg-shadow-2);
+  -webkit-backdrop-filter: blur(var(--kg-blur-soft)) saturate(var(--kg-sat));
+  backdrop-filter: blur(var(--kg-blur-soft)) saturate(var(--kg-sat));
+  color: var(--kg-ink);
+  font-size: 13px;
+  line-height: 18px;
+}
+html body .kg-findbar[hidden] {
+  display: none;
+}
+html body .kg-findbar-query {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-radius: 4px;
+  padding: 0 3px;
+  background-color: var(--kg-find);
+}
+html body .kg-findbar-count {
+  margin: 0 6px 0 8px;
+  color: var(--kg-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+html body .kg-findbar-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--kg-r-xs);
+  background: transparent;
+  color: var(--kg-muted);
+  cursor: pointer;
+  transition: background-color var(--kg-t), color var(--kg-t);
+}
+html body .kg-findbar-button svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+html body .kg-findbar-button:hover:not(:disabled) {
+  background-color: var(--kg-surface-strong);
+  color: var(--kg-ink);
+}
+html body .kg-findbar-button:disabled {
+  color: var(--kg-faint);
+  opacity: 0.45;
+  cursor: default;
+}
+html body .kg-findbar-button:focus-visible {
+  outline: var(--dsw-focus-ring-width) solid var(--dsw-focus-ring-color);
+  outline-offset: -2px;
+}
+
 /* 改动文件的悬停对比浮层（改动文件卡上悬停 500ms 出现的 HoverCard preview）。
    这块内容是要逐行读的代码，可它的底色只来自 --dsw-alias-bg-layer-1，玻璃皮肤
    把这个令牌调成了半透明（白天 0.74 / 夜间 0.70），于是浮层下面那 9 行文件列表
@@ -1979,6 +2056,12 @@ html body ::-webkit-scrollbar-corner {
   }
   html body .pI_x6G_sidebarCol {
     background-color: rgba(255, 255, 255, 0.86) !important;
+  }
+  /* 搜索命中条：令牌两套主题各有一份，直接用实色那一档 */
+  html body .kg-findbar {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background-color: var(--kg-tint-opaque);
   }
   /* 夜间：上面三条带 !important 的白天值会压过夜间桌面和玻璃，正文 --kg-ink
      又是近白，于是白底白字。多一个 [data-ds-dark-theme]（特异度更高）换回暗色：
