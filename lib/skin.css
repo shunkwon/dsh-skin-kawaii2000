@@ -414,12 +414,17 @@ html body[data-ds-dark-theme] {
   --kg-shadow-window: 0 24px 60px -36px rgba(0, 0, 0, 0.8);
   --kg-shadow-card: 0 20px 44px -26px rgba(0, 0, 0, 0.85), 0 2px 8px -4px rgba(0, 0, 0, 0.4);
 
-  --dsw-static-neutral-bluish-00:   #2a2a2e;
+  /* static 色板在 dsh 里是「绝对色」：主题自己的夜间表只换 alias，static 白天夜间
+     几乎同值（00 是白、1000 是近黑）。组件会绕过 alias 直接用 static —— 提示气泡的字
+     和里面的快捷键键帽就是 color: var(--dsw-static-neutral-bluish-00)，底色却是 alias
+     （夜间近黑）。所以 00 / 60 / 75 / 150 / 1000 这几级不能反相，跟白天同值，
+     否则就是黑底黑字（2026-10-25 截图）。其余几级只是调亮，暗底上当前景色读得出来。 */
+  --dsw-static-neutral-bluish-00:   #ffffff;
   --dsw-static-neutral-bluish-50:   #f2f2f3;
-  --dsw-static-neutral-bluish-60:   #34343a;
-  --dsw-static-neutral-bluish-75:   #3a3a40;
+  --dsw-static-neutral-bluish-60:   #f4f4f6;
+  --dsw-static-neutral-bluish-75:   #efeff1;
   --dsw-static-neutral-bluish-100:  #f2f2f3;
-  --dsw-static-neutral-bluish-150:  #3c3c42;
+  --dsw-static-neutral-bluish-150:  #e2e2e6;
   --dsw-static-neutral-bluish-200:  #aeaeb4;
   --dsw-static-neutral-bluish-300:  #c7c7cc;
   --dsw-static-neutral-bluish-400:  #b4b4ba;
@@ -432,7 +437,7 @@ html body[data-ds-dark-theme] {
   --dsw-static-neutral-bluish-875:  #29292d;
   --dsw-static-neutral-bluish-900:  #222226;
   --dsw-static-neutral-bluish-950:  #1a1a1d;
-  --dsw-static-neutral-bluish-1000: #f2f2f3;
+  --dsw-static-neutral-bluish-1000: #0e0e10;
 
   --dsw-static-deepseek-400: #e5e5e7;
   --dsw-static-deepseek-450: #d4d4d8;
@@ -838,7 +843,10 @@ html body [role="button"]:active:not([aria-disabled="true"]) {
   transform: translateY(0.5px) scale(0.995);
 }
 
-html body button:disabled,
+/* disabled 却又写 aria-disabled="false"，是应用在说「点不了，但不是禁用态」——
+   Agent 预设里当前选中的那张卡（aria-pressed="true"）就是这样。它不压暗，
+   否则选中的那一项看着像不可用。 */
+html body button:disabled:not([aria-disabled="false"]),
 html body button[aria-disabled="true"],
 html body [role="button"][aria-disabled="true"] {
   opacity: 0.45;
@@ -1816,6 +1824,14 @@ html body [role="alertdialog"] {
     var(--kg-shadow-3) !important;
   -webkit-backdrop-filter: blur(var(--kg-blur-soft)) saturate(var(--kg-sat));
   backdrop-filter: blur(var(--kg-blur-soft)) saturate(var(--kg-sat));
+}
+/* 输入卡里的弹层（「+」、@ 文件、/ 指令那张列表）是卡片的子节点，不传送到 body。
+   卡片自己带 backdrop-filter，成了它们的 backdrop root：弹层的模糊只够得着卡片里的
+   东西，伸出卡片的那一截底下，对话原样透上来，0.86 / 0.9 的玻璃挡不住，两层字叠在
+   一起（夜间最显眼：暗底上亮字的残影）。模糊补不回来，所以用实色，同全屏面板。
+   模型菜单是传送出去的，模糊照常生效，不在此列。 */
+html body [class*="uV2eYG_card"] :is([role="listbox"], [role="menu"], [role="dialog"]) {
+  background-color: var(--kg-tint-opaque) !important;
 }
 html body [role="menuitem"],
 html body [role="option"] {

@@ -186,3 +186,15 @@ substring 匹配很容易命中嵌套子节点 —— 比如 `[class*="_card"]` 
 在气泡出现或移动时量出包含块原点、用 `translate` 抵回去，并把贴边的气泡收回面板
 以内。给新的面板加玻璃时不用另外处理；要按面板坐标亲手摆某个提示（像展开时开关
 那个），写 `translate: none !important`。菜单用的是 CSS 锚点定位，不受影响。
+
+## 维护提示：static 色板别反相
+
+dsh 的令牌分两层：`--dsw-static-*` 是绝对色（主题的夜间表几乎不动它，`bluish-00`
+始终是白、`bluish-1000` 始终是近黑），`--dsw-alias-*` 才跟着主题翻。组件会直接用
+static —— 提示气泡的字和快捷键键帽就是 `var(--dsw-static-neutral-bluish-00)`，
+底色却是 alias。所以夜间表里 static 只能「调亮当前景色用」，不能把白那一端翻成深色，
+否则就是黑底黑字。
+
+改完颜色，白天夜间各开一次，把提示、菜单打开，在控制台粘
+[tools/audit-contrast.js](./tools/audit-contrast.js)：它按元素实际落到的底色算
+对比度，列出低于 3 的字和图标，夜间再列出偏白的面。
