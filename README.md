@@ -156,7 +156,12 @@ opens the session and stays at the bottom, so the skin adds the rest.
   result snippet, since the snippet is the search backend's best match.
 - If the app pulls the view back to the bottom within 3 s of the jump, it
   scrolls back. Once you scroll, click or press a key yourself, it lets go.
-- Switching to another session clears the marks.
+- A small bar floats at the top right of the conversation: "keyword 2 / 5 ↑ ↓ ×",
+  so you can see how many matches there are and which one you're on. ↑ ↓ or
+  ⇧⌘G / ⌘G step between them; × closes the bar and clears the marks. It counts
+  what is on the page (loaded turns, folded steps included); with older history
+  still unloaded it reads "5+", and "无匹配" if nothing was found.
+- Switching to another session closes the bar and clears the marks.
 - If the keyword is inside a turn's folded steps (under "Done in …"), that fold
   is expanded first, the way the browser's own find-in-page does it. Content
   that is never rendered (such as tool output nobody opened) can't be found;
