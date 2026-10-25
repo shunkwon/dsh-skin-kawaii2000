@@ -84,6 +84,9 @@ html body {
   --kg-on-accent-dim: rgba(255, 255, 255, 0.62); /* 强调色面上的次级字（快捷键） */
   --kg-focus: rgba(0, 0, 0, 0.22);        /* 输入卡聚焦时的发丝线 */
   --kg-focus-halo: rgba(0, 0, 0, 0.05);
+  /* 搜索命中：荧光笔黄。「查找」和成功/警告/错误一样算语义色，所以带色相 */
+  --kg-find: rgba(255, 214, 10, 0.32);
+  --kg-find-current: rgba(255, 176, 0, 0.72);
   --kg-link-line: rgba(29, 29, 31, 0.28);
   --kg-link-line-hover: rgba(29, 29, 31, 0.7);
   --kg-quote-line: rgba(0, 0, 0, 0.16);
@@ -396,6 +399,8 @@ html body[data-ds-dark-theme] {
   --kg-on-accent-dim: rgba(29, 29, 31, 0.62);
   --kg-focus: rgba(255, 255, 255, 0.26);
   --kg-focus-halo: rgba(255, 255, 255, 0.05);
+  --kg-find: rgba(255, 214, 10, 0.22);
+  --kg-find-current: rgba(255, 190, 40, 0.55);
   --kg-link-line: rgba(242, 242, 243, 0.3);
   --kg-link-line-hover: rgba(242, 242, 243, 0.75);
   --kg-quote-line: rgba(255, 255, 255, 0.2);
@@ -1689,6 +1694,16 @@ html body [role="switch"][aria-checked="false"] {
 html body ::selection {
   background-color: var(--kg-selection);
   color: var(--kg-ink);
+}
+
+/* 搜索结果点进来后的关键词高亮（lib/search-jump.js 用 CSS.highlights 注册）：
+   kg-find 是所有出现处，含侧栏结果的标题和摘录；kg-find-current 是滚过去的那处。
+   不改字色，夜间的浅字落在半透明黄上照样读得清。 */
+html body ::highlight(kg-find) {
+  background-color: var(--kg-find);
+}
+html body ::highlight(kg-find-current) {
+  background-color: var(--kg-find-current);
 }
 
 /* --------------------------------------------------------------------------

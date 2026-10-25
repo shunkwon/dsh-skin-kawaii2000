@@ -142,6 +142,28 @@ DeepSeek.app, where the title has to clear the traffic lights, the offset is set
 on the header alone). If you add a variable that follows the sidebar state,
 don't set it on the frame or the root.
 
+## Search results jump to the match
+
+When the sidebar search (⌥⌘K) finds text inside a conversation, clicking a
+result opens the session and scrolls to where the keyword is. That spot gets a
+darker yellow mark and the other matches in the session a light one; the
+keyword is also marked in the result titles and snippets. The app itself only
+opens the session and stays at the bottom, so the skin adds the rest.
+
+- If the keyword is in older history, it presses *Load earlier* (up to 10
+  pages) and looks again.
+- With several matches it picks the one whose surrounding words best match the
+  result snippet, since the snippet is the search backend's best match.
+- If the app pulls the view back to the bottom within 3 s of the jump, it
+  scrolls back. Once you scroll, click or press a key yourself, it lets go.
+- Switching to another session clears the marks.
+- Text inside collapsed tool calls or reasoning isn't on the page; then the
+  session just opens without a jump.
+
+The code is `lib/search-jump.js`. Marks use the CSS Custom Highlight API
+(`CSS.highlights`, no DOM changes), coloured by `--kg-find` /
+`--kg-find-current` in `skin.css`.
+
 ## In DeepSeek.app: the top bar is the titlebar
 
 DeepSeek.app (the WKWebView wrapper in the Dock, source in
