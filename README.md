@@ -188,6 +188,14 @@ level to the top (at most 8), with a hairline below them:
   the session reopens the folders that were expanded, level by level (up to
   12, current workspace only). Collapsing a folder forgets everything below it.
 
+- **Sort by time:** a "时间 | 名称" (time / name) switch at the top of the panel,
+  time by default: folders and files mixed, newest first. Name goes back to
+  folders first, by name. When a big folder (like Downloads) is cut to 2,000
+  entries, the newest ones are kept. This needs the local dsh patch
+  `~/.dsh/patches/files-sort-by-time.mjs` (it adds modification times to
+  listings and lets the panel sort by them); rerun it after upgrading dsh and
+  restart dsh. Without the patch the switch is hidden and the panel sorts by name.
+
 The code is `lib/files-pin.js`. It only sets CSS `order` on pinned rows and
 never moves the app's nodes; state lives in localStorage (`kg-files-pin:v1`),
 so DeepSeek.app and a browser keep separate records.
