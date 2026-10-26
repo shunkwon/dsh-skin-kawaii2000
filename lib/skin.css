@@ -858,6 +858,16 @@ html body [role="button"][aria-disabled="true"] {
   box-shadow: none !important;
 }
 
+/* 上面把所有按钮的描边都去掉了，可 primitives 的「描边按钮」（variant outline，插件市场的
+   「安装」、各处的次要操作）就靠那一圈 0.5px 线认出是按钮，去掉后只剩一行字。
+   给它补一圈内侧发丝线，和玻璃面的亮边同一个画法。 */
+html body [class*="_outline_1rv3m"] {
+  box-shadow: inset 0 0 0 1px var(--kg-hair-strong) !important;
+}
+html body [class*="_outline_1rv3m"]:hover:not(:disabled) {
+  background-color: var(--kg-surface) !important;
+}
+
 html body [class*="_iconButton"]:hover,
 html body [class*="_searchButton"]:hover,
 html body [class*="_toolBar"] button:hover {
@@ -2072,6 +2082,30 @@ html body .kg-files-pin:focus-visible {
   outline: var(--dsw-focus-ring-width) solid var(--dsw-focus-ring-color);
   outline-offset: -2px;
 }
+/* 插件页（已安装 / 发现）。
+   - 没有图标的插件、发现页的空状态用的是 primitives 的 PluginArtworkDefault：一块
+     青到蓝渐变的拼图，整页唯一带色相的东西。只改填充（CSS fill 压过 fill 属性），
+     形状不动，退成石墨色。认它靠渐变 id 的前缀 dsh_plugin_art。
+   - 发现页的分类胶囊（全部 / 工具 / …）和页签一个画法：没选中的透明，选中的是一块
+     亮玻璃 + 淡投影；原来没选中的是一块近白底，放在白卡上几乎看不出。 */
+html body svg path[fill^="url(#dsh_plugin_art"] {
+  fill: var(--kg-muted);
+}
+html body [class*="_pill_1bqmh"][class*="_interactive_1bqmh"] {
+  background-color: transparent !important;
+  color: var(--kg-muted) !important;
+  box-shadow: none !important;
+}
+html body [class*="_pill_1bqmh"][class*="_interactive_1bqmh"]:hover {
+  background-color: var(--kg-surface) !important;
+  color: var(--kg-ink) !important;
+}
+html body [class*="_pill_1bqmh"][class*="_interactive_1bqmh"][class*="_active_1bqmh"] {
+  background-color: var(--kg-surface-max) !important;
+  color: var(--kg-ink) !important;
+  box-shadow: var(--kg-shadow-1), inset 0 0 0 1px var(--kg-rim-top) !important;
+}
+
 /* 文件面板顶上的「时间 | 名称」排序开关（lib/files-pin.js 放进路径那一行、「重新读取」前面）。
    和页签同一套：凹下去的浅槽里，选中那格是一块亮玻璃。 */
 html body .kg-files-sort {
