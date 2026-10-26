@@ -171,6 +171,27 @@ The code is `lib/search-jump.js`. Marks use the CSS Custom Highlight API
 (`CSS.highlights`, no DOM changes), coloured by `--kg-find` /
 `--kg-find-current` in `skin.css`.
 
+## Files panel: common folders on top
+
+When the workspace is your home folder, ⌥⌘P opens on two hundred entries led by
+`__pycache__` and hidden dot-folders. The skin moves the common folders in each
+level to the top (at most 8), with a hairline below them:
+
+- **Defaults:** projects, Documents, Desktop and Downloads in the home folder.
+- **Automatic:** folders you've opened 3 or more times in that level (top 3 per
+  level). The new order applies the next time that level is shown, so the row
+  you just clicked doesn't jump out from under the pointer.
+- **Manual:** hover a folder row and click the pin on the right to pin or
+  unpin it; pinned rows keep a faint pin. Folders you unpin (defaults included)
+  are no longer pinned automatically.
+- **Remembered expansion:** reopening the panel, reloading or switching back to
+  the session reopens the folders that were expanded, level by level (up to
+  12, current workspace only). Collapsing a folder forgets everything below it.
+
+The code is `lib/files-pin.js`. It only sets CSS `order` on pinned rows and
+never moves the app's nodes; state lives in localStorage (`kg-files-pin:v1`),
+so DeepSeek.app and a browser keep separate records.
+
 ## In DeepSeek.app: the top bar is the titlebar
 
 DeepSeek.app (the WKWebView wrapper in the Dock, source in

@@ -114,6 +114,22 @@
 实现在 `lib/search-jump.js`，高亮用 CSS Custom Highlight API（`CSS.highlights`，
 不改 DOM），颜色是 `skin.css` 里的 `--kg-find` / `--kg-find-current`。
 
+## 文件面板：常用文件夹置顶
+
+工作区是家目录时，⌥⌘P 打开就是两百多项，最前面全是 `__pycache__` 和点开头的隐藏目录。
+皮肤把每一层里常用的文件夹排到最前（最多 8 个），下面一条细线隔开：
+
+- **默认**：家目录那一层的 projects、Documents、Desktop、Downloads。
+- **自动**：同一层里展开过 3 次以上的文件夹（每层取前 3 个）。为了不让刚点的那行从
+  指针下跳走，排序在这一层下次显示时生效。
+- **手动**：指针停在文件夹行上，右边出一个图钉，点一下钉住 / 取消；钉住的行平时留一个淡图钉。
+  取消过的（包括默认那几个）不再自动置顶。
+- **记住展开**：重新打开面板、刷新页面或换回这个会话时，上次展开着的文件夹按层自动点开
+  （最多 12 个，只限当前工作区）。收起一个文件夹会连它底下的一起忘掉。
+
+实现在 `lib/files-pin.js`：只给置顶的行写 CSS `order`，不搬应用的节点；记录存在浏览器的
+localStorage（键 `kg-files-pin:v1`），DeepSeek.app 和浏览器各记各的。
+
 ## 在 DeepSeek.app 里：顶栏就是标题栏
 
 DeepSeek.app（Dock 上那个 WKWebView 外壳，源码在 `~/Library/Application Support/DeepSeekWebApp`）
