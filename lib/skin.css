@@ -867,6 +867,11 @@ html body [class*="_outline_1rv3m"] {
 html body [class*="_outline_1rv3m"]:hover:not(:disabled) {
   background-color: var(--kg-surface) !important;
 }
+/* 禁用时（如插件市场里不兼容的「安装」）上面的禁用规则会把它也清掉，线照样留着、跟着整体变淡 */
+html body button[class*="_outline_1rv3m"]:disabled:not([aria-disabled="false"]),
+html body button[class*="_outline_1rv3m"][aria-disabled="true"] {
+  box-shadow: inset 0 0 0 1px var(--kg-hair-strong) !important;
+}
 
 html body [class*="_iconButton"]:hover,
 html body [class*="_searchButton"]:hover,
