@@ -1312,6 +1312,21 @@ html[data-kg-topbar] body .wSkVaW_header:has([data-conversation-tabs]) {
   }
 }
 
+/* 右上角的右栏开关换一个图标：原来是 1px 细线的方框加一道竖线（翻转过来指右），
+   换成和系统图标同粗的 1.25px 线、圆角放大的版本，竖线在右边（右栏那一格）。
+   SVG 是应用渲染的，改不了 path，所以把原来的线藏起来、用遮罩在同一块地方画新的，
+   颜色仍是按钮的 currentColor，白天夜间、悬停都跟着走。应用给它的 scaleX(-1) 翻转
+   要去掉，新图标本来就朝右。只改这一个按钮：左栏开关、右栏里的「收起」保持原样。 */
+html body ._1kL45W_icon {
+  transform: none;
+  background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.25'%3E%3Crect x='1.75' y='2.75' width='12.5' height='10.5' rx='2.75'/%3E%3Cpath d='M10 2.75v10.5'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.25'%3E%3Crect x='1.75' y='2.75' width='12.5' height='10.5' rx='2.75'/%3E%3Cpath d='M10 2.75v10.5'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+}
+html body ._1kL45W_icon > * {
+  display: none;
+}
+
 /* 在 DeepSeek.app 里：顶栏就是窗口标题栏（学 Claude Code）。
    app（~/Library/Application Support/DeepSeekWebApp/main.swift）把标题栏做成透明、内容铺满，
    红绿灯直接落在页面最上面那一行，并在 <html> 上留下约定：
