@@ -1312,19 +1312,48 @@ html[data-kg-topbar] body .wSkVaW_header:has([data-conversation-tabs]) {
   }
 }
 
-/* 右上角的右栏开关换一个图标：原来是 1px 细线的方框加一道竖线（翻转过来指右），
-   换成和系统图标同粗的 1.25px 线、圆角放大的版本，竖线在右边（右栏那一格）。
+/* 右栏相关的几个图标换成一套：和系统图标同粗的 1.25px 线、圆角放大的方框、圆线头。
+   原来是 1px 细线（「全屏」还是填充的轮廓），和皮肤里别的图标不是一路。
    SVG 是应用渲染的，改不了 path，所以把原来的线藏起来、用遮罩在同一块地方画新的，
-   颜色仍是按钮的 currentColor，白天夜间、悬停都跟着走。应用给它的 scaleX(-1) 翻转
-   要去掉，新图标本来就朝右。只改这一个按钮：左栏开关、右栏里的「收起」保持原样。 */
-html body ._1kL45W_icon {
+   颜色仍是按钮的 currentColor，白天夜间、悬停都跟着走。
+   - 右上角「打开右侧边栏」、右栏里「收起右侧边栏」：竖线在右边（右栏那一格）。
+     应用给这两个的 scaleX(-1) 翻转要去掉，新图标本来就朝右。
+   - 右栏里「分栏」：竖线在正中。
+   - 右栏里「全屏」/「退出全屏」：四个角向外 / 向内。
+   后三个按钮的 SVG 没有类名，按原图标的 path 认（:has），dsh 换了图标就不再匹配、
+   退回原样，不会套错。左栏开关保持原样。 */
+html body :is(
+  ._1kL45W_icon,
+  .P3OORG_collapseGlyph,
+  svg:has(> path[d="M8 1.5V14.5"]),
+  .P3OORG_iconButton svg:has(> path[d^="M2.33203 10.4054"]),
+  .P3OORG_iconButton svg:has(> path[d^="M9 2.5V6C9"])
+) {
   transform: none;
   background-color: currentColor;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.25'%3E%3Crect x='1.75' y='2.75' width='12.5' height='10.5' rx='2.75'/%3E%3Cpath d='M10 2.75v10.5'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.25'%3E%3Crect x='1.75' y='2.75' width='12.5' height='10.5' rx='2.75'/%3E%3Cpath d='M10 2.75v10.5'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  -webkit-mask: var(--kg-glyph) center / 100% 100% no-repeat;
+  mask: var(--kg-glyph) center / 100% 100% no-repeat;
 }
-html body ._1kL45W_icon > * {
+html body :is(
+  ._1kL45W_icon,
+  .P3OORG_collapseGlyph,
+  svg:has(> path[d="M8 1.5V14.5"]),
+  .P3OORG_iconButton svg:has(> path[d^="M2.33203 10.4054"]),
+  .P3OORG_iconButton svg:has(> path[d^="M9 2.5V6C9"])
+) > * {
   display: none;
+}
+html body :is(._1kL45W_icon, .P3OORG_collapseGlyph) {
+  --kg-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='1.75' y='2.75' width='12.5' height='10.5' rx='2.75'/%3E%3Cpath d='M10 2.75v10.5'/%3E%3C/svg%3E");
+}
+html body svg:has(> path[d="M8 1.5V14.5"]) {
+  --kg-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='1.75' y='2.75' width='12.5' height='10.5' rx='2.75'/%3E%3Cpath d='M8 2.75v10.5'/%3E%3C/svg%3E");
+}
+html body .P3OORG_iconButton svg:has(> path[d^="M2.33203 10.4054"]) {
+  --kg-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1.75 6V4.5a1.75 1.75 0 0 1 1.75-1.75h2M10.5 2.75h2a1.75 1.75 0 0 1 1.75 1.75V6M14.25 10v1.5a1.75 1.75 0 0 1-1.75 1.75h-2M5.5 13.25h-2a1.75 1.75 0 0 1-1.75-1.75V10'/%3E%3C/svg%3E");
+}
+html body .P3OORG_iconButton svg:has(> path[d^="M9 2.5V6C9"]) {
+  --kg-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.75 2.75v2a1.25 1.25 0 0 1-1.25 1.25H1.75M10.25 2.75v2a1.25 1.25 0 0 0 1.25 1.25h2.75M10.25 13.25v-2a1.25 1.25 0 0 1 1.25-1.25h2.75M5.75 13.25v-2a1.25 1.25 0 0 0-1.25-1.25H1.75'/%3E%3C/svg%3E");
 }
 
 /* 在 DeepSeek.app 里：顶栏就是窗口标题栏（学 Claude Code）。
