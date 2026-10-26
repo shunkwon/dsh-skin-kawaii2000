@@ -1990,6 +1990,83 @@ html body .kg-findbar-button:focus-visible {
   outline-offset: -2px;
 }
 
+/* 工作区文件面板（⌥⌘P）的常用文件夹置顶（lib/files-pin.js）。
+   每层 ul 改成 flex 纵列，脚本给置顶的 li 写负的 order 排到前面 —— 只改视觉顺序，
+   不动 React 的节点。置顶组最后一项下面一条发丝线；手动钉住的行尾留一个淡图钉；
+   悬停文件夹行时右边出图钉按钮（脚本把它挪进那个 li，绝对定位），行的右内边距
+   让出它的位置，长名字照常省略。 */
+html body .k-1LKG_level {
+  display: flex;
+  flex-direction: column;
+}
+html body .k-1LKG_item[data-files-entry="directory"] {
+  position: relative;
+}
+html body .k-1LKG_item[data-kg-pin-end] {
+  margin-bottom: 4px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--kg-hair);
+}
+html body .k-1LKG_item[data-kg-pinned="manual"] > .k-1LKG_row::after {
+  content: "";
+  flex: none;
+  width: 12px;
+  height: 12px;
+  margin-left: auto;
+  background-color: currentColor;
+  opacity: 0.4;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 2.25h4M6.75 2.25v4L4.5 9.25h7L9.25 6.25v-4M8 9.25v4.5'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 2.25h4M6.75 2.25v4L4.5 9.25h7L9.25 6.25v-4M8 9.25v4.5'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+}
+html body .k-1LKG_item[data-files-entry="directory"]:hover > .k-1LKG_row {
+  padding-right: 34px;
+}
+html body .k-1LKG_item[data-kg-pinned="manual"]:hover > .k-1LKG_row::after {
+  visibility: hidden;
+}
+html body .kg-files-pin {
+  position: absolute;
+  right: 6px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--kg-faint);
+  cursor: pointer;
+  transition: background-color var(--kg-t), color var(--kg-t);
+}
+html body .k-1LKG_item:hover > .kg-files-pin,
+html body .kg-files-pin:focus-visible {
+  display: inline-flex;
+}
+html body .kg-files-pin svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+html body .kg-files-pin:hover {
+  background-color: var(--dsw-alias-interactive-bg-hover);
+  color: var(--kg-ink);
+}
+html body .kg-files-pin[data-on="true"] {
+  color: var(--kg-ink);
+}
+html body .kg-files-pin[data-on="true"] svg path {
+  fill: currentColor;
+  fill-opacity: 0.25;
+}
+html body .kg-files-pin:focus-visible {
+  outline: var(--dsw-focus-ring-width) solid var(--dsw-focus-ring-color);
+  outline-offset: -2px;
+}
+
 /* 改动文件的悬停对比浮层（改动文件卡上悬停 500ms 出现的 HoverCard preview）。
    这块内容是要逐行读的代码，可它的底色只来自 --dsw-alias-bg-layer-1，玻璃皮肤
    把这个令牌调成了半透明（白天 0.74 / 夜间 0.70），于是浮层下面那 9 行文件列表
