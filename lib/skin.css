@@ -1491,6 +1491,12 @@ html body [class*="_tabStrip"] {
   padding: 0 !important;
   gap: 4px !important;
 }
+/* 页签上的 ×：应用按 28px 高的页签写死 top: 4px 刚好居中；上面给页签加了 3px 上下
+   内边距，页签变成 34px，× 就比标题高出 3px。改成按页签高度居中。 */
+html body [class*="_tabClose_6nhg2"] {
+  top: 50% !important;
+  translate: 0 -50%;
+}
 html body [class*="_stripChrome"] button,
 html body [class*="_iconButton_6nhg2"] {
   background-color: transparent !important;
